@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { api, RecipientPortalData, BACKEND_URL } from "@/lib/api";
 import { clearRecipientEmail, loadRecipientEmail } from "@/lib/recipient-auth";
+import { pageVariants, staggerContainer, fadeUp, cardHover, cardTap } from "@/lib/animations";
 
 export default function RecipientDashboardPage() {
   const router = useRouter();
@@ -88,7 +90,7 @@ export default function RecipientDashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+      <motion.main variants={pageVariants} initial="hidden" animate="visible" className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         <section className="bg-white rounded-3xl border border-[var(--color-border)] p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--color-primary)]">Recipient Summary</p>
           <div className="mt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
@@ -121,9 +123,9 @@ export default function RecipientDashboardPage() {
               <p className="text-sm text-[var(--color-muted)] mt-2">Once an organizer issues a credential to your email, it will appear here.</p>
             </div>
           ) : (
-            <div className="divide-y divide-[var(--color-border)]">
+            <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="divide-y divide-[var(--color-border)]">
               {data.certificates.map((certificate) => (
-                <article key={certificate.id} className="px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <motion.article key={certificate.id} variants={fadeUp} whileHover={cardHover} className="px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
                     <p className="text-base font-semibold text-[var(--color-foreground)]">{certificate.eventName}</p>
                     <div className="mt-2 flex flex-wrap gap-3 text-sm text-[var(--color-muted)]">
@@ -132,23 +134,25 @@ export default function RecipientDashboardPage() {
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-3">
-                    <Link href={`/verify?code=${encodeURIComponent(certificate.verificationCode)}`} className="border border-[var(--color-border)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)]">
-                      Verify
-                    </Link>
+                    <motion.div whileTap={cardTap}>
+                      <Link href={`/verify?code=${encodeURIComponent(certificate.verificationCode)}`} className="border border-[var(--color-border)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)]">
+                        Verify
+                      </Link>
+                    </motion.div>
                     {certificate.pdfUrl ? (
-                      <a href={`${BACKEND_URL}${certificate.pdfUrl}`} target="_blank" rel="noopener noreferrer" className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--color-primary-dark)]">
+                      <motion.a href={`${BACKEND_URL}${certificate.pdfUrl}`} target="_blank" rel="noopener noreferrer" whileTap={cardTap} className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--color-primary-dark)]">
                         Download PDF
-                      </a>
+                      </motion.a>
                     ) : (
                       <span className="px-4 py-2 rounded-xl text-sm font-medium bg-[var(--color-surface-alt)] text-[var(--color-muted)]">PDF pending</span>
                     )}
                   </div>
-                </article>
+                </motion.article>
               ))}
-            </div>
+            </motion.div>
           )}
         </section>
-      </main>
+      </motion.main>
     </div>
   );
 }

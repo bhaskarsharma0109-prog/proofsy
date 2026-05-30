@@ -16,7 +16,7 @@ exports.createEvent = async (req, res) => {
       });
     }
 
-    const event = await Event.create({ name, date, organizerName, templateId, duration });
+    const event = await Event.create({ name, date, organizerName, templateId, duration, organizationId: req.organizationId });
 
     return res.status(201).json({
       success: true,
@@ -37,7 +37,7 @@ exports.createEvent = async (req, res) => {
 // GET /api/events
 exports.listEvents = async (req, res) => {
   try {
-    const events = await Event.find().sort({ createdAt: -1 });
+    const events = await Event.find({ organizationId: req.organizationId }).sort({ createdAt: -1 });
 
     return res.json({
       success: true,
@@ -64,9 +64,9 @@ exports.getEvent = async (req, res) => {
       return res.status(400).json({ success: false, error: "Invalid event id" });
     }
 
-    const event = await Event.findById(id);
+    const event = await Event.findOne({ _id: id, organizationId: req.organizationId });
     if (!event) {
-      return res.status(404).json({ success: false, error: "Event not found" });
+      return res.status(404).json({ success: false, error: "Event not found or unauthorized" });
     }
 
     const certificates = await Certificate.find({ eventId: event._id })
@@ -112,11 +112,11 @@ exports.deleteEvent = async (req, res) => {
       });
     }
 
-    const event = await Event.findById(id);
+    const event = await Event.findOne({ _id: id, organizationId: req.organizationId });
     if (!event) {
       return res.status(404).json({
         success: false,
-        error: "Event not found",
+        error: "Event not found or unauthorized",
       });
     }
 

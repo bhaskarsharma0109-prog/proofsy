@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import { api, EventDetailData, BACKEND_URL } from "@/lib/api";
-import { pageVariants, staggerContainer, fadeUp, headerSlide, tableRow, pulseGlow } from "@/lib/animations";
+import { pageVariants, staggerContainer, fadeUp, headerSlide, tableRow, pulseGlow, cardTap } from "@/lib/animations";
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -14,6 +14,8 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<EventDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sendingEmails, setSendingEmails] = useState(false);
+  const [emailResult, setEmailResult] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -38,6 +40,23 @@ export default function EventDetailPage() {
   const generated = event?.certificates.filter((c) => c.status === "generated").length || 0;
   const pending = event?.certificates.filter((c) => c.status === "pending").length || 0;
   const failed = event?.certificates.filter((c) => c.status === "failed").length || 0;
+
+  const handleSendEmails = async () => {
+    if (!event) return;
+    setSendingEmails(true);
+    setEmailResult(null);
+    try {
+      const res = await api.sendEmails(params.id as string);
+      if (res.success) {
+        setEmailResult(res.message || `Sent: ${res.data?.sent}, Failed: ${res.data?.failed}`);
+      } else {
+        setEmailResult(`Error: ${res.error}`);
+      }
+    } catch {
+      setEmailResult("Failed to send emails");
+    }
+    setSendingEmails(false);
+  };
 
   return (
     <div className="flex min-h-screen bg-[var(--color-background)]">
@@ -75,13 +94,24 @@ export default function EventDetailPage() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Link
-                    href={`/events/new?template=${encodeURIComponent(event.templateId || "modern")}`}
-                    className="border border-[var(--color-border)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)] flex items-center gap-1.5"
+                  <motion.div whileTap={cardTap}>
+                    <Link
+                      href={`/events/${params.id}/add-recipients`}
+                      className="border border-[var(--color-border)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)] flex items-center gap-1.5"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
+                      Add Recipients
+                    </Link>
+                  </motion.div>
+                  <motion.button
+                    onClick={handleSendEmails}
+                    disabled={sendingEmails || generated === 0}
+                    whileTap={cardTap}
+                    className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--color-primary-dark)] flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                    Add Recipients
-                  </Link>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                    {sendingEmails ? "Sending..." : "Send Emails"}
+                  </motion.button>
                 </div>
               </div>
             </motion.header>
@@ -101,6 +131,12 @@ export default function EventDetailPage() {
                   </motion.div>
                 ))}
               </motion.div>
+
+              {emailResult && (
+                <div className={`rounded-xl px-5 py-3 text-sm font-medium ${emailResult.startsWith("Error") || emailResult.startsWith("Failed") ? "bg-[var(--color-error-bg)] text-[var(--color-error)]" : "bg-[var(--color-success-bg)] text-[var(--color-success)]"}`}>
+                  {emailResult}
+                </div>
+              )}
 
               {/* Certificates table */}
               <div className="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">

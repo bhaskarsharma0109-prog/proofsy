@@ -36,23 +36,7 @@
   --color-warning-bg: #FFFBEB;
 }
 
-/* Dark Mode Variables (System Default) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-primary-faint: rgba(37, 99, 235, 0.15);
-    --color-background: #0B1120;
-    --color-surface: #1E293B;
-    --color-surface-alt: #0F172A;
-    --color-foreground: #F8FAFC;
-    --color-muted: #94A3B8;
-    --color-border: #334155;
-    --color-border-strong: #475569;
-    
-    --color-success-bg: rgba(22, 163, 74, 0.15);
-    --color-error-bg: rgba(220, 38, 38, 0.15);
-    --color-warning-bg: rgba(217, 119, 6, 0.15);
-  }
-}
+/* Dark mode disabled — permanent light mode */
 
 body {
   background-color: var(--color-background);
@@ -76,4 +60,25 @@ body {
 
 @layer utilities {
   .text-balance { text-wrap: balance; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--color-surface-alt) 25%, var(--color-border) 50%, var(--color-surface-alt) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
 }

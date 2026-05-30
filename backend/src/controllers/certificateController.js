@@ -9,9 +9,10 @@ const Certificate = require("../models/Certificate");
 
 // POST /api/certificates/generate
 exports.generateCertificates = async (req, res) => {
+  const file = req.file;
+
   try {
     const { eventId } = req.body;
-    const file = req.file;
 
     if (!eventId) {
       return res.status(400).json({ success: false, error: "Missing eventId" });
@@ -44,8 +45,6 @@ exports.generateCertificates = async (req, res) => {
     });
 
     if (rows.length === 0) {
-      // Clean up uploaded file
-      fs.unlinkSync(file.path);
       return res.status(400).json({
         success: false,
         error: "CSV is empty or missing required columns (name, email).",
@@ -120,9 +119,6 @@ exports.generateCertificates = async (req, res) => {
       created = insertedCerts.length;
     }
 
-    // Clean up uploaded file
-    fs.unlinkSync(file.path);
-
     // Push certificate generation to the background worker via Bull/Redis
     try {
       const Queue = require("bull");
@@ -148,6 +144,11 @@ exports.generateCertificates = async (req, res) => {
   } catch (err) {
     console.error("generateCertificates error:", err);
     return res.status(500).json({ success: false, error: "Internal server error" });
+  } finally {
+    // Always clean up uploaded file, even on errors
+    if (file?.path && fs.existsSync(file.path)) {
+      try { fs.unlinkSync(file.path); } catch { /* ignore cleanup errors */ }
+    }
   }
 };
 

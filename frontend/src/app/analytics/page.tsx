@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import MetricCard from "@/components/MetricCard";
@@ -32,6 +33,7 @@ function buildMonthlyData(certificates: CertificateData[]) {
 }
 
 export default function AnalyticsPage() {
+  const router = useRouter();
   const [events, setEvents] = useState<EventData[]>([]);
   const [certificates, setCertificates] = useState<CertificateData[]>([]);
   const [stats, setStats] = useState<StatsData | null>(null);
@@ -74,10 +76,10 @@ export default function AnalyticsPage() {
   }, []);
 
   const kpis = [
-    { label: "Credentials Issued", value: stats?.totalCertificates || 0, color: "bg-blue-50 text-blue-600" },
-    { label: "Ready To Verify", value: stats?.generated || 0, color: "bg-emerald-50 text-emerald-600" },
-    { label: "Coverage Rate", value: stats?.verificationRate || 0, suffix: "%", color: "bg-purple-50 text-purple-600" },
-    { label: "Active Recipients", value: stats?.totalUsers || 0, color: "bg-amber-50 text-amber-600" },
+    { label: "Credentials Issued", value: stats?.totalCertificates || 0, color: "bg-blue-50 text-blue-600", href: "/certificates" },
+    { label: "Ready To Verify", value: stats?.generated || 0, color: "bg-emerald-50 text-emerald-600", href: "/certificates" },
+    { label: "Coverage Rate", value: stats?.verificationRate || 0, suffix: "%", color: "bg-purple-50 text-purple-600", href: "/analytics" },
+    { label: "Active Recipients", value: stats?.totalUsers || 0, color: "bg-amber-50 text-amber-600", href: "/recipients" },
   ];
   const monthlyData = buildMonthlyData(certificates);
   const maxValue = Math.max(...monthlyData.map((d) => d.value));
@@ -102,6 +104,45 @@ export default function AnalyticsPage() {
     .sort((a, b) => b.certs - a.certs)
     .slice(0, 5);
 
+  // Per-event breakdown: unique recipients and ready-to-verify (generated) certificates
+  const perEventStats = (() => {
+    const eventMap = new Map<string, { name: string; recipients: Set<string>; generated: number; total: number }>();
+    for (const cert of certificates) {
+      const key = cert.eventName;
+      if (!eventMap.has(key)) {
+        eventMap.set(key, { name: key, recipients: new Set(), generated: 0, total: 0 });
+      }
+      const entry = eventMap.get(key)!;
+      entry.recipients.add(cert.recipientEmail.toLowerCase());
+      entry.total += 1;
+      if (cert.status === "generated") entry.generated += 1;
+    }
+    return Array.from(eventMap.values())
+      .map((e) => ({ name: e.name, recipients: e.recipients.size, generated: e.generated, total: e.total }))
+      .sort((a, b) => b.total - a.total);
+  })();
+
+  const handleExport = () => {
+    if (certificates.length === 0) return;
+    const headers = ["Recipient", "Email", "Event", "Status", "Issued At", "Verification Code"];
+    const rows = certificates.map((c) => [
+      c.recipientName,
+      c.recipientEmail,
+      c.eventName,
+      c.status,
+      new Date(c.issuedAt).toLocaleDateString(),
+      c.verificationCode,
+    ]);
+    const csvContent = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `proofsy-analytics-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="flex min-h-screen bg-[var(--color-background)]">
       <Sidebar />
@@ -121,7 +162,7 @@ export default function AnalyticsPage() {
               <option>Last 12 months</option>
               <option>All time</option>
             </select>
-            <button className="border border-[var(--color-border)] rounded-lg px-4 py-2 text-sm font-medium hover:bg-[var(--color-surface-alt)] cursor-pointer flex items-center gap-2">
+            <button onClick={handleExport} className="border border-[var(--color-border)] rounded-lg px-4 py-2 text-sm font-medium hover:bg-[var(--color-surface-alt)] cursor-pointer flex items-center gap-2 disabled:opacity-50" disabled={certificates.length === 0}>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
@@ -141,7 +182,7 @@ export default function AnalyticsPage() {
           {/* KPIs */}
           <motion.section variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             {kpis.map((k) => (
-              <motion.div key={k.label} variants={fadeUp} whileHover={{ scale: 1.03, y: -3, transition: { type: 'spring', stiffness: 400, damping: 25 } }}>
+              <motion.div key={k.label} variants={fadeUp} whileHover={{ scale: 1.03, y: -3, transition: { type: 'spring', stiffness: 400, damping: 25 } }} onClick={() => router.push(k.href)} className="cursor-pointer">
                 <MetricCard
                   label={k.label}
                   value={k.value}
@@ -243,6 +284,57 @@ export default function AnalyticsPage() {
                   </div>
                 ))}
               </div>
+            )}
+          </motion.section>
+
+          {/* Recipients & Readiness by Event */}
+          <motion.section variants={fadeUp} className="bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
+            <div className="px-6 py-5 border-b border-[var(--color-border)]">
+              <h3 className="text-base font-bold text-[var(--color-foreground)]">Recipients & Readiness by Event</h3>
+              <p className="text-xs text-[var(--color-muted)] mt-0.5">Unique recipients and generated certificates per event</p>
+            </div>
+            {perEventStats.length === 0 ? (
+              <div className="px-6 py-12 text-center">
+                <p className="text-sm text-[var(--color-muted)]">No event data available yet.</p>
+              </div>
+            ) : (
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-[var(--color-surface-alt)]">
+                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Event</th>
+                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)] text-center">Recipients</th>
+                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)] text-center">Ready to Verify</th>
+                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)] text-center">Total Certs</th>
+                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)] text-right">Readiness</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--color-border)]">
+                  {perEventStats.map((ev) => (
+                    <tr key={ev.name} className="hover:bg-[var(--color-surface-alt)]">
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-[var(--color-foreground)]">{ev.name}</span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center justify-center min-w-[2rem] px-2 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold">{ev.recipients}</span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center justify-center min-w-[2rem] px-2 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold">{ev.generated}</span>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="text-sm font-medium text-[var(--color-foreground)]">{ev.total}</span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <div className="w-20 h-1.5 bg-[var(--color-surface-alt)] rounded-full overflow-hidden">
+                            <div className="h-full bg-[var(--color-primary)] rounded-full" style={{ width: `${ev.total > 0 ? (ev.generated / ev.total) * 100 : 0}%` }} />
+                          </div>
+                          <span className="text-xs font-mono text-[var(--color-muted)] tabular-nums w-10 text-right">{ev.total > 0 ? Math.round((ev.generated / ev.total) * 100) : 0}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </motion.section>
         </motion.div>

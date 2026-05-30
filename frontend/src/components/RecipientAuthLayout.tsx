@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { pageVariants, fadeUp } from "@/lib/animations";
 
 export default function RecipientAuthLayout({
   title,
@@ -33,7 +35,7 @@ export default function RecipientAuthLayout({
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-6 py-12">
+      <motion.main variants={pageVariants} initial="hidden" animate="visible" className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-5xl grid lg:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
           <section className="hidden lg:block bg-white rounded-[28px] border border-[var(--color-border)] p-10 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--color-primary)]">Certificate Access</p>
@@ -59,15 +61,15 @@ export default function RecipientAuthLayout({
             </div>
           </section>
 
-          <section className="bg-white rounded-[28px] border border-[var(--color-border)] p-8 shadow-sm">
+          <motion.section variants={fadeUp} className="bg-white rounded-[28px] border border-[var(--color-border)] p-8 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--color-primary)]">Recipient Access</p>
             <h2 className="mt-3 text-3xl font-bold text-[var(--color-foreground)]">{title}</h2>
             <p className="mt-2 text-sm text-[var(--color-muted)]">{description}</p>
             <div className="mt-8">{children}</div>
             <div className="mt-6 text-sm text-[var(--color-muted)]">{footer}</div>
-          </section>
+          </motion.section>
         </div>
-      </main>
+      </motion.main>
     </div>
   );
 }

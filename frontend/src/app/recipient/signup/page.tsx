@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import RecipientAuthLayout from "@/components/RecipientAuthLayout";
 import { api } from "@/lib/api";
 import { saveRecipientEmail } from "@/lib/recipient-auth";
+import { cardTap } from "@/lib/animations";
 
 export default function RecipientSignupPage() {
   const router = useRouter();
@@ -72,13 +74,14 @@ export default function RecipientSignupPage() {
           />
         </div>
         {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
-        <button
+        <motion.button
           type="submit"
           disabled={submitting || !name.trim() || !email.trim()}
+          whileTap={cardTap}
           className="w-full bg-[var(--color-primary)] text-white font-semibold py-3 rounded-xl hover:bg-[var(--color-primary-dark)] disabled:opacity-50"
         >
           {submitting ? "Creating account..." : "Create Account"}
-        </button>
+        </motion.button>
       </form>
     </RecipientAuthLayout>
   );

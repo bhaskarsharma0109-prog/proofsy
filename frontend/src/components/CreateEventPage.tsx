@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
-import { api } from "@/lib/api";
-import { TEMPLATE_DEFINITIONS } from "@/lib/templates";
+import { api, BACKEND_URL, TemplateListItem } from "@/lib/api";
+import { pageVariants, fadeUp, cardTap } from "@/lib/animations";
 
 interface Recipient {
   id: string;
@@ -15,6 +16,9 @@ interface Recipient {
 export default function CreateEventPage({ initialTemplate }: { initialTemplate?: string }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [templates, setTemplates] = useState<TemplateListItem[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(true);
+  
   const [manuallySelectedTemplate, setManuallySelectedTemplate] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -29,17 +33,27 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
   const [organizer, setOrganizer] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchTemplates() {
+      const res = await api.listTemplates();
+      if (res.success && res.data) {
+        setTemplates(res.data);
+      }
+      setLoadingTemplates(false);
+    }
+    fetchTemplates();
+  }, []);
+
   const selectedTemplate = useMemo(() => {
     if (manuallySelectedTemplate) {
       return manuallySelectedTemplate;
     }
-
-    if (initialTemplate && TEMPLATE_DEFINITIONS.some((template) => template.id === initialTemplate)) {
+    if (initialTemplate && templates.some((t) => t.id === initialTemplate)) {
       return initialTemplate;
     }
-
-    return "modern";
-  }, [initialTemplate, manuallySelectedTemplate]);
+    return templates.length > 0 ? templates[0].id : null;
+  }, [initialTemplate, manuallySelectedTemplate, templates]);
 
   const addRecipient = () => {
     if (!newName.trim() || !newEmail.trim()) return;
@@ -59,6 +73,11 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
   };
 
   const handleSubmit = async () => {
+    if (!selectedTemplate) {
+      setSubmitError("Please select a template.");
+      return;
+    }
+
     setSubmitting(true);
     setSubmitError(null);
 
@@ -116,7 +135,7 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
           <p className="text-sm text-[var(--color-muted)] mt-0.5">Set up an event, choose a template, and add recipients.</p>
         </header>
 
-        <div className="px-8 py-8 max-w-4xl">
+        <motion.div variants={pageVariants} initial="hidden" animate="visible" className="px-8 py-8 max-w-4xl">
           {/* Progress steps */}
           <div className="flex items-center gap-2 mb-8">
             {stepTitles.map((title, i) => (
@@ -126,8 +145,7 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer
                     ${step === i + 1 ? "bg-[var(--color-primary)] text-white" : step > i + 1 ? "bg-[var(--color-success-bg)] text-[var(--color-success)]" : "bg-[var(--color-surface-alt)] text-[var(--color-muted)]"}`}
                 >
-                  <span className="w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px]
-                    ${step > i + 1 ? 'border-current' : 'border-current'}">
+                  <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-[10px] border-current`}>
                     {step > i + 1 ? "✓" : i + 1}
                   </span>
                   <span className="hidden sm:inline">{title}</span>
@@ -139,51 +157,67 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
 
           {/* Step 1: Template Selection */}
           {step === 1 && (
-            <div className="space-y-6">
+            <motion.div variants={fadeUp} className="space-y-6">
               <div>
                 <h3 className="text-lg font-bold text-[var(--color-foreground)]">Choose a Certificate Template</h3>
                 <p className="text-sm text-[var(--color-muted)] mt-1">Select a design that matches your event style.</p>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                {TEMPLATE_DEFINITIONS.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => setManuallySelectedTemplate(t.id)}
-                    className={`relative rounded-2xl border-2 p-1 cursor-pointer text-left group
-                      ${selectedTemplate === t.id ? `${t.accent} shadow-md` : "border-[var(--color-border)] hover:border-[var(--color-border-strong)] hover:shadow-sm"}`}
-                  >
-                    {/* Preview */}
-                    <div className={`bg-gradient-to-br ${t.color} rounded-xl h-36 flex flex-col items-center justify-center relative overflow-hidden`}>
-                      {/* Mini certificate mockup */}
-                      <div className="w-24 h-16 bg-white rounded shadow-sm border flex flex-col items-center justify-center">
-                        <div className="w-10 h-1 bg-gray-300 rounded mb-1" />
-                        <div className="w-14 h-1.5 bg-gray-400 rounded mb-1" />
-                        <div className="w-8 h-1 bg-gray-300 rounded" />
-                      </div>
-                      {selectedTemplate === t.id && (
-                        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-primary)] flex items-center justify-center">
-                          <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
-                        </div>
-                      )}
-                    </div>
-                    <div className="px-3 py-3">
-                      <p className="text-sm font-semibold text-[var(--color-foreground)]">{t.name}</p>
-                      <p className="text-[11px] text-[var(--color-muted)] mt-0.5">{t.desc}</p>
-                    </div>
+              
+              {loadingTemplates ? (
+                <div className="text-center py-10">
+                  <svg className="w-6 h-6 animate-spin mx-auto text-[var(--color-muted)]" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                  <p className="text-sm text-[var(--color-muted)] mt-3">Loading templates...</p>
+                </div>
+              ) : templates.length === 0 ? (
+                <div className="bg-[var(--color-surface-alt)] rounded-xl border border-[var(--color-border)] p-8 text-center">
+                  <p className="text-[var(--color-foreground)] font-semibold">No templates available</p>
+                  <p className="text-sm text-[var(--color-muted)] mt-1">Please create a template first before creating an event.</p>
+                  <button onClick={() => router.push("/templates")} className="mt-4 px-4 py-2 bg-[var(--color-primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--color-primary-dark)]">
+                    Go to Templates
                   </button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                  {templates.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setManuallySelectedTemplate(t.id)}
+                      className={`relative rounded-2xl border-2 p-1 cursor-pointer text-left group
+                        ${selectedTemplate === t.id ? `border-[var(--color-primary)] shadow-md` : "border-[var(--color-border)] hover:border-[var(--color-border-strong)] hover:shadow-sm"}`}
+                    >
+                      {/* Preview */}
+                      <div className="bg-[var(--color-surface-alt)] rounded-xl h-36 flex flex-col items-center justify-center relative overflow-hidden">
+                        {t.backgroundType === "image" ? (
+                          <img src={`${BACKEND_URL}${t.backgroundUrl}`} alt={t.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="text-[var(--color-muted)] text-xs font-semibold">PDF Template</div>
+                        )}
+                        {selectedTemplate === t.id && (
+                          <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-primary)] flex items-center justify-center">
+                            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="px-3 py-3">
+                        <p className="text-sm font-semibold text-[var(--color-foreground)] truncate">{t.name}</p>
+                        <p className="text-[11px] text-[var(--color-muted)] mt-0.5">{t.textLayerCount} layers</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="flex justify-end">
-                <button onClick={() => setStep(2)} className="bg-[var(--color-primary)] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] cursor-pointer">
+                <button onClick={() => setStep(2)} disabled={!selectedTemplate} className="bg-[var(--color-primary)] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] cursor-pointer disabled:opacity-50">
                   Continue →
                 </button>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Step 2: Event Details */}
           {step === 2 && (
-            <div className="space-y-6">
+            <motion.div variants={fadeUp} className="space-y-6">
               <div>
                 <h3 className="text-lg font-bold text-[var(--color-foreground)]">Event Details</h3>
                 <p className="text-sm text-[var(--color-muted)] mt-1">Basic information about your event.</p>
@@ -212,12 +246,12 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
                 <button onClick={() => setStep(1)} className="px-5 py-2.5 border border-[var(--color-border)] rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)] cursor-pointer">← Back</button>
                 <button onClick={() => setStep(3)} className="bg-[var(--color-primary)] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] cursor-pointer">Continue →</button>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Step 3: Recipients */}
           {step === 3 && (
-            <div className="space-y-6">
+            <motion.div variants={fadeUp} className="space-y-6">
               <div>
                 <h3 className="text-lg font-bold text-[var(--color-foreground)]">Add Recipients</h3>
                 <p className="text-sm text-[var(--color-muted)] mt-1">Add people who will receive certificates.</p>
@@ -313,12 +347,12 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
                 <button onClick={() => setStep(2)} className="px-5 py-2.5 border border-[var(--color-border)] rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)] cursor-pointer">← Back</button>
                 <button onClick={() => setStep(4)} className="bg-[var(--color-primary)] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] cursor-pointer">Continue →</button>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* Step 4: Review */}
           {step === 4 && (
-            <div className="space-y-6">
+            <motion.div variants={fadeUp} className="space-y-6">
               <div>
                 <h3 className="text-lg font-bold text-[var(--color-foreground)]">Review & Create</h3>
                 <p className="text-sm text-[var(--color-muted)] mt-1">Confirm your event setup before generating certificates.</p>
@@ -334,7 +368,7 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
                 <div className="px-6 py-4 flex items-center justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">Template</p>
-                    <p className="text-sm font-semibold mt-1 capitalize">{selectedTemplate}</p>
+                    <p className="text-sm font-semibold mt-1">{templates.find(t => t.id === selectedTemplate)?.name || selectedTemplate}</p>
                   </div>
                   <button onClick={() => setStep(1)} className="text-xs text-[var(--color-primary)] font-medium hover:underline cursor-pointer">Change</button>
                 </div>
@@ -356,9 +390,10 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
               </div>
               <div className="flex justify-between">
                 <button onClick={() => setStep(3)} className="px-5 py-2.5 border border-[var(--color-border)] rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)] cursor-pointer">← Back</button>
-                <button
+                <motion.button
                   onClick={handleSubmit}
                   disabled={submitting || !eventName || !eventDate || !organizer}
+                  whileTap={cardTap}
                   className="bg-[var(--color-primary)] text-white px-8 py-2.5 rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] cursor-pointer shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? (
@@ -372,11 +407,11 @@ export default function CreateEventPage({ initialTemplate }: { initialTemplate?:
                       Create Event & Generate Certificates
                     </>
                   )}
-                </button>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </main>
     </div>
   );

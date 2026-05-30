@@ -16,15 +16,21 @@ const EventSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      required: true,
+    },
     duration: {
       type: String,
       trim: true,
       default: null,
     },
+    // References the new Template model (ObjectId)
+    // Legacy events may have string templateId ("modern", "classic", etc.) — handle gracefully
     templateId: {
-      type: String,
-      enum: ["classic", "modern", "elegant", "corporate", "academic", "creative"],
-      default: "modern",
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
     },
   },
   { timestamps: true }

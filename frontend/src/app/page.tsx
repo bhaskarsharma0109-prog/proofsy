@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import MetricCard from "@/components/MetricCard";
 import { api, CertificateData, EventData, StatsData } from "@/lib/api";
-import { pageVariants, staggerContainer, fadeUp, headerSlide, tableRow, float, pulseGlow } from "@/lib/animations";
+import { pageVariants, staggerContainer, fadeUp, headerSlide, tableRow, float, pulseGlow, cardHover, cardTap } from "@/lib/animations";
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [events, setEvents] = useState<EventData[]>([]);
   const [certificates, setCertificates] = useState<CertificateData[]>([]);
   const [stats, setStats] = useState<StatsData | null>(null);
@@ -50,10 +52,10 @@ export default function AdminDashboard() {
   }, []);
 
   const metrics = [
-    { label: "Total Events", value: stats?.totalEvents || 0, icon: "calendar", color: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400" },
-    { label: "Certificates Issued", value: stats?.totalCertificates || 0, icon: "doc", color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" },
-    { label: "Recipients", value: stats?.totalUsers || 0, icon: "users", color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400" },
-    { label: "Ready To Verify", value: stats?.verificationRate || 0, suffix: "%", icon: "shield", color: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400" },
+    { label: "Total Events", value: stats?.totalEvents || 0, icon: "calendar", color: "bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400", href: "/events/new" },
+    { label: "Certificates Issued", value: stats?.totalCertificates || 0, icon: "doc", color: "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400", href: "/certificates" },
+    { label: "Recipients", value: stats?.totalUsers || 0, icon: "users", color: "bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400", href: "/recipients" },
+    { label: "Ready To Verify", value: stats?.verificationRate || 0, suffix: "%", icon: "shield", color: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400", href: "/certificates" },
   ];
 
   const iconMap: Record<string, React.ReactNode> = {
@@ -108,19 +110,23 @@ export default function AdminDashboard() {
             <p className="text-sm text-[var(--color-muted)] mt-0.5">Your certificate pipeline at a glance.</p>
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              href="/recipient/login"
-              className="border border-[var(--color-border)] text-[var(--color-foreground)] px-5 py-2.5 rounded-xl hover:bg-[var(--color-surface-alt)] font-semibold text-sm"
-            >
-              Recipient Login
-            </Link>
-            <Link
-              href="/events/new"
-              className="bg-[var(--color-primary)] text-white px-5 py-2.5 rounded-xl hover:bg-[var(--color-primary-dark)] font-semibold text-sm shadow-sm hover:shadow flex items-center gap-2 cursor-pointer"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-              New Event
-            </Link>
+            <motion.div whileHover={cardHover} whileTap={cardTap}>
+              <Link
+                href="/recipient/login"
+                className="border border-[var(--color-border)] text-[var(--color-foreground)] px-5 py-2.5 rounded-xl hover:bg-[var(--color-surface-alt)] font-semibold text-sm block"
+              >
+                Recipient Login
+              </Link>
+            </motion.div>
+            <motion.div whileHover={cardHover} whileTap={cardTap}>
+              <Link
+                href="/events/new"
+                className="bg-[var(--color-primary)] text-white px-5 py-2.5 rounded-xl hover:bg-[var(--color-primary-dark)] font-semibold text-sm shadow-sm hover:shadow flex items-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                New Event
+              </Link>
+            </motion.div>
           </div>
         </motion.header>
 
@@ -136,7 +142,7 @@ export default function AdminDashboard() {
           {/* Metrics */}
           <motion.section variants={staggerContainer} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             {metrics.map((m) => (
-              <motion.div key={m.label} variants={fadeUp} whileHover={{ scale: 1.03, y: -3, transition: { type: 'spring', stiffness: 400, damping: 25 } }}>
+              <motion.div key={m.label} variants={fadeUp} whileHover={cardHover} whileTap={cardTap} onClick={() => router.push(m.href)} className="cursor-pointer">
                 <MetricCard
                   label={m.label}
                   value={m.value}
@@ -149,72 +155,129 @@ export default function AdminDashboard() {
             ))}
           </motion.section>
 
-          {/* Events Table */}
-          <motion.section variants={fadeUp} className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden">
-            <div className="px-6 py-5 flex items-center justify-between border-b border-[var(--color-border)]">
+          {/* Events as separate entities */}
+          <motion.section variants={fadeUp}>
+            <div className="flex items-center justify-between mb-5">
               <div>
-                <h3 className="text-base font-bold text-[var(--color-foreground)]">Recent Events</h3>
-                <p className="text-xs text-[var(--color-muted)] mt-0.5">Manage and track certificate issuance</p>
+                <h3 className="text-base font-bold text-[var(--color-foreground)]">Your Events</h3>
+                <p className="text-xs text-[var(--color-muted)] mt-0.5">Each event is a separate certificate pipeline</p>
               </div>
-              <Link href="/events/new" className="text-sm font-medium text-[var(--color-primary)] hover:underline cursor-pointer">
-                Create new →
-              </Link>
+              <motion.div whileHover={cardHover} whileTap={cardTap}>
+                <Link href="/events/new" className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--color-primary-dark)] flex items-center gap-2 cursor-pointer block">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                  New Event
+                </Link>
+              </motion.div>
             </div>
 
             {eventMessage && (
-              <div className="px-6 py-3 border-b border-[var(--color-border)] bg-[var(--color-surface-alt)] text-sm text-[var(--color-muted)]">
+              <div className="rounded-xl px-5 py-3 mb-4 bg-[var(--color-surface-alt)] border border-[var(--color-border)] text-sm text-[var(--color-muted)]">
                 {eventMessage}
               </div>
             )}
 
             {loading ? (
-              <div className="px-6 py-12 text-center">
+              <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] px-6 py-12 text-center">
                 <svg className="w-6 h-6 animate-spin mx-auto text-[var(--color-muted)]" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                 <p className="text-sm text-[var(--color-muted)] mt-3">Loading events...</p>
               </div>
             ) : events.length === 0 ? (
-              <div className="px-6 py-12 text-center">
+              <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] px-6 py-12 text-center">
                 <svg className="w-12 h-12 mx-auto text-[var(--color-muted)] opacity-30 mb-4" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
                 <p className="text-sm font-medium text-[var(--color-foreground)]">No events yet</p>
                 <p className="text-xs text-[var(--color-muted)] mt-1">Create your first event to start issuing certificates.</p>
-                <Link href="/events/new" className="inline-flex items-center gap-2 mt-4 bg-[var(--color-primary)] text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--color-primary-dark)] cursor-pointer">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                  Create Event
-                </Link>
+                <motion.div whileHover={cardHover} whileTap={cardTap} className="inline-block mt-4">
+                  <Link href="/events/new" className="inline-flex items-center gap-2 bg-[var(--color-primary)] text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--color-primary-dark)] cursor-pointer">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    Create Event
+                  </Link>
+                </motion.div>
               </div>
             ) : (
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-[var(--color-surface-alt)]">
-                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Event</th>
-                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Date</th>
-                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Organizer</th>
-                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)] text-right">Created</th>
-                    <th className="px-6 py-3 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)] text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--color-border)]">
-                  {events.map((e, i) => (
-                    <motion.tr key={e.id} variants={tableRow} initial="hidden" animate="visible" transition={{ delay: i * 0.05 }} className="hover:bg-[var(--color-surface-alt)] group">
-                      <td className="px-6 py-4">
-                        <p className="text-sm font-semibold text-[var(--color-foreground)] group-hover:text-[var(--color-primary)]">{e.name}</p>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[var(--color-muted)]">{formatDate(e.date)}</td>
-                      <td className="px-6 py-4 text-sm text-[var(--color-muted)]">{e.organizerName}</td>
-                      <td className="px-6 py-4 text-sm text-[var(--color-muted)] text-right">{formatDate(e.createdAt)}</td>
-                      <td className="px-6 py-4 text-right">
+              <motion.div variants={staggerContainer} className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {events.map((e, i) => {
+                  const eventCerts = certificates.filter((c) => c.eventName === e.name);
+                  const eventGenerated = eventCerts.filter((c) => c.status === "generated").length;
+                  const eventRecipients = new Set(eventCerts.map((c) => c.recipientEmail.toLowerCase())).size;
+                  const readiness = eventCerts.length > 0 ? Math.round((eventGenerated / eventCerts.length) * 100) : 0;
+
+                  return (
+                    <motion.div
+                      key={e.id}
+                      variants={fadeUp}
+                      whileHover={cardHover}
+                      className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden hover:border-[var(--color-primary)]/40 hover:shadow-lg hover:shadow-[var(--color-primary)]/5 transition-all duration-300"
+                    >
+                      {/* Card header */}
+                      <div className="px-5 py-4 border-b border-[var(--color-border)]">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-base font-bold text-[var(--color-foreground)] truncate">{e.name}</h4>
+                            <div className="flex items-center gap-3 mt-1.5">
+                              <span className="text-xs text-[var(--color-muted)] flex items-center gap-1">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                                {formatDate(e.date)}
+                              </span>
+                              <span className="text-xs text-[var(--color-muted)] flex items-center gap-1">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                                {e.organizerName}
+                              </span>
+                            </div>
+                          </div>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${readiness === 100 ? "bg-emerald-50 text-emerald-600" : readiness > 0 ? "bg-amber-50 text-amber-600" : "bg-gray-100 text-gray-500"}`}>
+                            {readiness === 100 ? "Ready" : readiness > 0 ? "In Progress" : "New"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Per-event stats */}
+                      <div className="px-5 py-4 grid grid-cols-3 gap-3">
+                        <div className="text-center p-2.5 rounded-xl bg-blue-50/60">
+                          <p className="text-lg font-bold text-blue-600">{eventCerts.length}</p>
+                          <p className="text-[10px] uppercase tracking-wider font-medium text-blue-400 mt-0.5">Certificates</p>
+                        </div>
+                        <div className="text-center p-2.5 rounded-xl bg-purple-50/60">
+                          <p className="text-lg font-bold text-purple-600">{eventRecipients}</p>
+                          <p className="text-[10px] uppercase tracking-wider font-medium text-purple-400 mt-0.5">Recipients</p>
+                        </div>
+                        <div className="text-center p-2.5 rounded-xl bg-emerald-50/60">
+                          <p className="text-lg font-bold text-emerald-600">{readiness}%</p>
+                          <p className="text-[10px] uppercase tracking-wider font-medium text-emerald-400 mt-0.5">Ready</p>
+                        </div>
+                      </div>
+
+                      {/* Readiness progress bar */}
+                      <div className="px-5 pb-2">
+                        <div className="w-full h-1.5 bg-[var(--color-surface-alt)] rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${readiness === 100 ? "bg-emerald-500" : readiness > 0 ? "bg-[var(--color-primary)]" : "bg-gray-300"}`}
+                            style={{ width: `${readiness}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Card actions */}
+                      <div className="px-5 py-3 border-t border-[var(--color-border)] flex items-center justify-between">
+                        <button
+                          onClick={() => router.push(`/events/${e.id}`)}
+                          className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[var(--color-primary-dark)] flex items-center gap-1.5 cursor-pointer transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                          View Event
+                        </button>
                         <button
                           onClick={() => handleDeleteEvent(e.id, e.name)}
                           disabled={deletingEventId === e.id}
-                          className="text-sm font-medium text-[var(--color-error)] hover:underline disabled:opacity-50"
+                          className="text-xs font-medium text-[var(--color-error)] hover:bg-red-50 px-3 py-2 rounded-lg disabled:opacity-50 cursor-pointer transition-colors flex items-center gap-1.5"
                         >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>
                           {deletingEventId === e.id ? "Deleting..." : "Delete"}
                         </button>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
             )}
           </motion.section>
         </motion.div>

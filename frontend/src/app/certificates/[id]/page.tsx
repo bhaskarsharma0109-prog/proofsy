@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { api, CertificateDetailData, BACKEND_URL } from "@/lib/api";
+import { scaleUp, fadeUp, cardTap } from "@/lib/animations";
 
 export default function CertificatePreview() {
   const params = useParams();
@@ -90,7 +92,7 @@ export default function CertificatePreview() {
   return (
     <div className="min-h-screen bg-[var(--color-background)]">
       {/* Top bar */}
-      <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+      <motion.header variants={fadeUp} initial="hidden" animate="visible" className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
@@ -102,33 +104,36 @@ export default function CertificatePreview() {
           </Link>
           <div className="flex items-center gap-3">
             {certificate.pdfUrl ? (
-              <a
+              <motion.a
                 href={`${BACKEND_URL}${certificate.pdfUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                whileTap={cardTap}
                 className="px-4 py-2 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg text-sm font-medium hover:bg-[var(--color-surface-alt)] cursor-pointer flex items-center gap-2 text-[var(--color-foreground)]"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                 Download PDF
-              </a>
+              </motion.a>
             ) : (
               <span className="px-4 py-2 bg-[var(--color-surface-alt)] border border-[var(--color-border)] rounded-lg text-sm font-medium text-[var(--color-muted)]">
                 PDF pending
               </span>
             )}
-            <Link
-              href={`/verify?code=${encodeURIComponent(certificate.verificationCode)}`}
-              className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-dark)] cursor-pointer flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
-              Verify
-            </Link>
+            <motion.div whileTap={cardTap}>
+              <Link
+                href={`/verify?code=${encodeURIComponent(certificate.verificationCode)}`}
+                className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-primary-dark)] cursor-pointer flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+                Verify
+              </Link>
+            </motion.div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
       {/* Certificate details bar */}
-      <div className="bg-[var(--color-surface)] border-b border-[var(--color-border)]">
+      <motion.div variants={fadeUp} initial="hidden" animate="visible" className="bg-[var(--color-surface)] border-b border-[var(--color-border)]">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-6 text-xs">
           <div className="flex items-center gap-2">
             <span className="text-[var(--color-muted)]">Code:</span>
@@ -147,13 +152,13 @@ export default function CertificatePreview() {
             <span className="font-mono text-[var(--color-foreground)]">{formatDate(certificate.issuedAt)}</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Certificate render */}
       <div className="flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-4xl">
           {/* Shadow wrapper for depth */}
-          <div className="bg-[var(--color-surface)] shadow-2xl rounded-sm overflow-hidden">
+          <motion.div variants={scaleUp} initial="hidden" animate="visible" className="bg-[var(--color-surface)] shadow-2xl rounded-sm overflow-hidden">
             {/* The certificate itself */}
             <div className="aspect-[1.414] relative flex flex-col items-center justify-center p-16" style={{
               border: '6px solid var(--color-primary)',
@@ -223,7 +228,7 @@ export default function CertificatePreview() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

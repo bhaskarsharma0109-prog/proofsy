@@ -1,6 +1,4 @@
-// When behind Nginx both frontend & backend share the same origin,
-// so we only need relative paths. For local dev without Nginx,
-// fall back to http://localhost:5000.
+export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export interface ApiResponse<T = unknown> {
@@ -16,6 +14,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout 
   const id = setTimeout(() => controller.abort(), timeout);
   try {
     const response = await fetch(url, {
+      credentials: "include",
       ...options,
       signal: controller.signal
     });
@@ -30,7 +29,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout 
 async function request<T>(path: string, options?: RequestInit): Promise<ApiResponse<T>> {
   try {
     const isFormData = options?.body instanceof FormData;
-    const headers: HeadersInit = { ...options?.headers };
+    const headers: Record<string, string> = { ...(options?.headers as Record<string, string>) };
     
     // Only set application/json if it's NOT FormData
     if (!isFormData && !headers["Content-Type"]) {
@@ -206,6 +205,93 @@ export const api = {
       };
     }>(`/verify/${encodeURIComponent(code)}`),
 
+  // Send Emails
+  sendEmails: (eventId: string) =>
+    request<{ sent: number; failed: number }>("/certificates/send-emails", {
+      method: "POST",
+      body: JSON.stringify({ eventId }),
+    }),
+
+  // Templates
+  createTemplate: (formData: FormData) =>
+    request<TemplateData>("/templates", { method: "POST", body: formData }),
+
+  listTemplates: () =>
+    request<TemplateListItem[]>("/templates"),
+
+  getTemplate: (id: string) =>
+    request<TemplateData>(`/templates/${encodeURIComponent(id)}`),
+
+  updateTemplate: (id: string, body: Partial<TemplateData>) =>
+    request<TemplateData>(`/templates/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+
+  deleteTemplate: (id: string) =>
+    request<{ id: string }>(`/templates/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
+
+  seedTemplates: () =>
+    request<{ message: string }>("/templates/seed", { method: "POST" }),
+
   // Health
   health: () => request<{ status: string; timestamp: string }>("/health"),
+
+  // Auth
+  register: (body: any) => request<any>("/auth/register", { method: "POST", body: JSON.stringify(body) }),
+  login: (body: any) => request<any>("/auth/login", { method: "POST", body: JSON.stringify(body) }),
+  logout: () => request<any>("/auth/logout", { method: "POST" }),
+  me: () => request<any>("/auth/me"),
 };
+
+// Template types
+export interface TextLayer {
+  _id?: string;
+  variable: "recipient_name" | "event_name" | "date" | "verification_code" | "organizer" | "duration" | "custom";
+  label: string;
+  x: number;
+  y: number;
+  fontSize: number;
+  fontFamily: string;
+  fontWeight: "normal" | "bold";
+  color: string;
+  textAlign: "left" | "center" | "right";
+  maxWidth: number | null;
+  customText?: string | null;
+}
+
+export interface QrCodeConfig {
+  enabled: boolean;
+  x: number;
+  y: number;
+  size: number;
+}
+
+export interface TemplateData {
+  _id: string;
+  name: string;
+  backgroundType: "image" | "pdf";
+  backgroundUrl: string;
+  width: number;
+  height: number;
+  textLayers: TextLayer[];
+  qrCode: QrCodeConfig;
+  isStarter: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TemplateListItem {
+  id: string;
+  name: string;
+  backgroundType: "image" | "pdf";
+  backgroundUrl: string;
+  width: number;
+  height: number;
+  textLayerCount: number;
+  isStarter: boolean;
+  qrCode: QrCodeConfig;
+  createdAt: string;
+}

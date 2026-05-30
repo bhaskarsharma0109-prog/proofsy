@@ -7,6 +7,9 @@ RUN npm ci
 
 COPY . .
 
+# Next.js bakes NEXT_PUBLIC_* vars at build time
+ENV NEXT_PUBLIC_API_URL=/api
+
 # Build the Next.js app in standalone mode
 RUN npm run build
 

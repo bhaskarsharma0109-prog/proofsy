@@ -5,10 +5,10 @@ const cors = require("cors");
 const helmet = require("helmet");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
 const path = require("path");
-const mongoSanitize = require("express-mongo-sanitize");
-const xss = require("xss-clean");
-const hpp = require("hpp");
+// Custom Express 5-compatible security middleware (replaces express-mongo-sanitize, xss-clean, hpp)
+const { sanitize } = require("./middleware/sanitize");
 const morgan = require("morgan");
 
 const logger = require("./utils/logger");
@@ -29,14 +29,12 @@ app.use(
     credentials: true,
   })
 );
-app.use(mongoSanitize());
-app.use(xss());
-app.use(hpp());
+app.use(sanitize);
 
 // Request limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: process.env.NODE_ENV === "production" ? 100 : 1000,
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
@@ -44,6 +42,7 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 // Performance middleware
+app.use(cookieParser());
 app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -57,10 +56,12 @@ app.use(morgan("dev", {
 app.use("/storage", express.static(path.join(__dirname, "../storage")));
 
 // Routes
+app.use("/api/auth", require("./routes/auth"));
 app.use("/api/events", require("./routes/events"));
 app.use("/api/certificates", require("./routes/certificates"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/verify", require("./routes/verify"));
+app.use("/api/templates", require("./routes/templates"));
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -114,18 +115,20 @@ async function startServer() {
     });
     logger.info("✓ Connected to MongoDB: " + mongoUri);
   } catch (err) {
-    if (process.env.NODE_ENV === "production") {
-      logger.error("Failed to connect to MongoDB in production. Exiting...");
+    // Only allow in-memory fallback in development or test
+    if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+      logger.warn(
+        "Local MongoDB not available, starting in-memory MongoDB for development..."
+      );
+      const { MongoMemoryServer } = require("mongodb-memory-server");
+      mongod = await MongoMemoryServer.create();
+      mongoUri = mongod.getUri();
+      await mongoose.connect(mongoUri);
+      logger.info("✓ Connected to in-memory MongoDB: " + mongoUri);
+    } else {
+      logger.error("Failed to connect to MongoDB. Exiting...");
       process.exit(1);
     }
-    logger.warn(
-      "Local MongoDB not available, starting in-memory MongoDB for development..."
-    );
-    const { MongoMemoryServer } = require("mongodb-memory-server");
-    mongod = await MongoMemoryServer.create();
-    mongoUri = mongod.getUri();
-    await mongoose.connect(mongoUri);
-    logger.info("✓ Connected to in-memory MongoDB: " + mongoUri);
   }
 
   server = app.listen(PORT, () => {

@@ -1,11 +1,12 @@
 import type { Variants } from "framer-motion";
 
-// Page-level fade in
+// Page-level fade in with cinematic blur
 export const pageVariants: Variants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, filter: "blur(10px)" },
   visible: {
     opacity: 1,
-    transition: { duration: 0.4, ease: "easeOut", staggerChildren: 0.08 },
+    filter: "blur(0px)",
+    transition: { duration: 0.6, ease: "easeOut", staggerChildren: 0.1 },
   },
 };
 
@@ -18,13 +19,14 @@ export const staggerContainer: Variants = {
   },
 };
 
-// Fade up for cards and sections
+// Fade up for cards and sections with blur and spring
 export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] },
+    filter: "blur(0px)",
+    transition: { type: "spring", stiffness: 350, damping: 25 },
   },
 };
 
@@ -40,11 +42,12 @@ export const fadeLeft: Variants = {
 
 // Scale up for interactive cards
 export const scaleUp: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
+  hidden: { opacity: 0, scale: 0.9, filter: "blur(5px)" },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+    filter: "blur(0px)",
+    transition: { type: "spring", stiffness: 400, damping: 20 },
   },
 };
 
@@ -68,16 +71,17 @@ export const headerSlide: Variants = {
   },
 };
 
-// Hover spring for cards
+// Hover spring for cards (magnetic-like feel)
 export const cardHover = {
-  scale: 1.02,
-  y: -2,
-  transition: { type: "spring" as const, stiffness: 400, damping: 25 },
+  scale: 1.03,
+  y: -4,
+  transition: { type: "spring" as const, stiffness: 500, damping: 20 },
 };
 
-// Tap effect
+// Satisfying Tap effect
 export const cardTap = {
-  scale: 0.98,
+  scale: 0.95,
+  transition: { type: "spring" as const, stiffness: 600, damping: 20 },
 };
 
 // Float animation (for decorative elements)

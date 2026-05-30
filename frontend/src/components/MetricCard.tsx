@@ -1,6 +1,8 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { fadeUp, cardHover } from "@/lib/animations";
 
 interface MetricCardProps {
   label: string;
@@ -47,14 +49,22 @@ export default function MetricCard({
   const animatedValue = useCountUp(value);
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-6 hover:shadow-md hover:border-[var(--color-border-strong)] transition-all cursor-default group">
+    <motion.div
+      variants={fadeUp}
+      whileHover={cardHover}
+      className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-6 hover:shadow-md hover:border-[var(--color-border-strong)] transition-all cursor-default group"
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)] mb-2">
             {label}
           </p>
           <p className="text-3xl font-bold text-[var(--color-foreground)] tabular-nums">
-            {loading ? "—" : animatedValue.toLocaleString()}
+            {loading ? (
+              <span className="inline-block w-16 h-8 rounded-lg animate-shimmer" />
+            ) : (
+              animatedValue.toLocaleString()
+            )}
             {suffix && <span className="text-lg text-[var(--color-muted)] ml-0.5">{suffix}</span>}
           </p>
         </div>
@@ -68,6 +78,6 @@ export default function MetricCard({
           <span className="text-[11px] text-[var(--color-muted)]">vs last period</span>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

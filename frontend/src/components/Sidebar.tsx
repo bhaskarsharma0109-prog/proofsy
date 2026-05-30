@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { staggerContainer, fadeLeft } from "@/lib/animations";
 import { api, StatsData } from "@/lib/api";
 import {
   onboardingSteps,
@@ -11,6 +13,7 @@ import {
   subscribeToOnboarding,
   trackOnboarding,
 } from "@/lib/onboarding";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navSections = [
   {
@@ -121,6 +124,7 @@ export default function Sidebar() {
   const [gettingStartedOpen, setGettingStartedOpen] = useState(true);
   const [onboarding, setOnboarding] = useState(readOnboardingState);
   const [stats, setStats] = useState<StatsData | null>(null);
+  const { member, logout } = useAuth();
 
   useEffect(() => {
     return subscribeToOnboarding(() => setOnboarding(readOnboardingState()));
@@ -209,7 +213,7 @@ export default function Sidebar() {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-2 px-3 overflow-y-auto">
+        <motion.nav variants={staggerContainer} initial="hidden" animate="visible" className="flex-1 py-2 px-3 overflow-y-auto">
           {navSections.map((section, si) => (
             <div key={si} className={si > 0 ? "mt-4" : ""}>
               {section.title && (
@@ -270,7 +274,7 @@ export default function Sidebar() {
                   }
 
                   return (
-                    <li key={item.href}>
+                    <motion.li key={item.href} variants={fadeLeft} whileHover={{ scale: 1.03, x: 2, transition: { type: "spring", stiffness: 400, damping: 20 } }}>
                       <Link
                         href={item.href}
                         className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium cursor-pointer
@@ -282,13 +286,13 @@ export default function Sidebar() {
                         {item.icon}
                         {item.label}
                       </Link>
-                    </li>
+                    </motion.li>
                   );
                 })}
               </ul>
             </div>
           ))}
-        </nav>
+        </motion.nav>
 
         {/* Getting Started + Footer */}
         <div className="border-t border-[var(--color-border)]">
@@ -363,7 +367,6 @@ export default function Sidebar() {
               <div className="h-full rounded-full bg-[var(--color-success)] transition-all duration-500" style={{ width: `${usageProgress}%` }} />
             </div>
           </div>
-
           {/* Upgrade */}
           <div className="px-4 pb-4 pt-1">
             <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--color-border)] text-[13px] font-semibold text-[var(--color-foreground)] hover:bg-[var(--color-surface-alt)] cursor-pointer">
@@ -373,6 +376,30 @@ export default function Sidebar() {
               Upgrade
             </button>
           </div>
+
+          {/* User Profile & Logout */}
+          {member && (
+            <div className="px-4 pb-4 pt-2 border-t border-[var(--color-border)]">
+              <div className="flex items-center justify-between mb-3 px-1 mt-1">
+                <div className="flex flex-col truncate pr-2">
+                  <span className="text-[13px] font-semibold text-[var(--color-foreground)] truncate">{member.name}</span>
+                  <span className="text-[11px] text-[var(--color-muted)] truncate">{member.email}</span>
+                </div>
+                <div className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded bg-[var(--color-surface-alt)] text-[var(--color-muted)]">
+                  {member.role === 'root' ? 'Admin' : 'Member'}
+                </div>
+              </div>
+              <button 
+                onClick={logout}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-transparent hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 border border-transparent hover:border-red-100 dark:hover:border-red-900/30 text-[13px] font-medium text-[var(--color-muted)] transition-colors cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                </svg>
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -404,4 +431,4 @@ export default function Sidebar() {
       )}
     </>
   );
-}
+};

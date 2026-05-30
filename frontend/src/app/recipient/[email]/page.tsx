@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { api, RecipientPortalData, BACKEND_URL } from "@/lib/api";
-import { fadeUp, pulseGlow } from "@/lib/animations";
+import { fadeUp, pulseGlow, cardHover, cardTap } from "@/lib/animations";
 
 export default function RecipientPortalPage() {
   const params = useParams();
@@ -109,7 +109,7 @@ export default function RecipientPortalPage() {
             ) : (
               <div className="space-y-4">
                 {data.certificates.map((cert) => (
-                  <motion.div key={cert.id} variants={fadeUp} className="bg-white rounded-2xl border border-[var(--color-border)] p-6 hover:shadow-md transition-shadow">
+                  <motion.div key={cert.id} variants={fadeUp} whileHover={cardHover} className="bg-white rounded-2xl border border-[var(--color-border)] p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h3 className="text-base font-bold text-[var(--color-foreground)]">{cert.eventName}</h3>
@@ -120,23 +120,26 @@ export default function RecipientPortalPage() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {cert.pdfUrl && (
-                          <a
+                          <motion.a
                             href={`${BACKEND_URL}${cert.pdfUrl}`}
                             target="_blank"
                             rel="noopener noreferrer"
+                            whileTap={cardTap}
                             className="flex items-center gap-1.5 border border-[var(--color-border)] px-3 py-1.5 rounded-lg text-xs font-medium text-[var(--color-foreground)] hover:bg-[var(--color-surface-alt)]"
                           >
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
                             PDF
-                          </a>
+                          </motion.a>
                         )}
-                        <Link
-                          href={`/verify?code=${encodeURIComponent(cert.verificationCode)}`}
-                          className="flex items-center gap-1.5 bg-[var(--color-primary)] text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[var(--color-primary-dark)]"
-                        >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
-                          Verify
-                        </Link>
+                        <motion.div whileTap={cardTap}>
+                          <Link
+                            href={`/verify?code=${encodeURIComponent(cert.verificationCode)}`}
+                            className="flex items-center gap-1.5 bg-[var(--color-primary)] text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[var(--color-primary-dark)]"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+                            Verify
+                          </Link>
+                        </motion.div>
                       </div>
                     </div>
                   </motion.div>
