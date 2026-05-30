@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Proofsy logo">
+  <defs>
+    <linearGradient id="proofsy-shield" x1="34" x2="166" y1="28" y2="176" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F766E"/>
+      <stop offset=".48" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="proofsy-paper" x1="72" x2="136" y1="52" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EAF2FF"/>
+    </linearGradient>
+    <filter id="proofsy-shadow" x="16" y="14" width="168" height="174" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="12" stdDeviation="11" flood-color="#0F172A" flood-opacity=".18"/>
+    </filter>
+  </defs>
+
+  <path fill="#D97706" d="M144.8 25.8l4.7 10.3 10.4 4.5-10.4 4.6-4.7 10.2-4.6-10.2-10.3-4.6 10.3-4.5 4.6-10.3z"/>
+  <path fill="url(#proofsy-shield)" d="M100 18c25.7 18.4 49 21.7 70 24.4v58.1c0 40.3-27.3 65.8-70 82.5-42.7-16.7-70-42.2-70-82.5V42.4C51 39.7 74.3 36.4 100 18z" filter="url(#proofsy-shadow)"/>
+  <path fill="#0F172A" fill-opacity=".16" d="M100 33.4c20.7 13 39.7 16.5 56.4 18.9v48.2c0 31.4-20.1 52.6-56.4 67.7-36.3-15.1-56.4-36.3-56.4-67.7V52.3c16.7-2.4 35.7-5.9 56.4-18.9z"/>
+  <path fill="url(#proofsy-paper)" d="M72 52h44.7L138 73.3V134c0 6.6-5.4 12-12 12H72c-6.6 0-12-5.4-12-12V64c0-6.6 5.4-12 12-12z"/>
+  <path fill="#BFDBFE" d="M116 52v15.5c0 4.2 3.3 7.5 7.5 7.5H138L116 52z"/>
+  <path stroke="#94A3B8" stroke-linecap="round" stroke-width="6" d="M78 86h42M78 104h30M78 122h20"/>
+  <circle cx="128" cy="126" r="28" fill="#10B981"/>
+  <path fill="none" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="10" d="M114 126.5l9 9 20-22"/>
+  <path fill="#FFFFFF" fill-opacity=".22" d="M45 55.5C66.2 53 81.6 47 100 35.4 118.4 47 133.8 53 155 55.5v11.8C127.4 61.6 84.1 61.6 45 88V55.5z"/>
+</svg>

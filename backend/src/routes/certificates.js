@@ -3,12 +3,24 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const certificateController = require("../controllers/certificateController");
+const { protect } = require("../middleware/auth");
 
-// Configure multer for CSV uploads
+// Configure multer for CSV uploads.
+// We require BOTH a CSV extension and an acceptable CSV-ish MIME type to reduce
+// the risk of disguised uploads being processed.
+const CSV_MIME_TYPES = new Set([
+  "text/csv",
+  "application/csv",
+  "application/vnd.ms-excel",
+  "text/plain",
+  "application/octet-stream",
+]);
+
 const upload = multer({
   dest: path.join(__dirname, "../../uploads/"),
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === "text/csv" || file.originalname.endsWith(".csv")) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext === ".csv" && CSV_MIME_TYPES.has(file.mimetype)) {
       cb(null, true);
     } else {
       cb(new Error("Only CSV files are allowed"), false);
@@ -17,10 +29,11 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
-router.post("/generate", upload.single("file"), certificateController.generateCertificates);
-router.post("/send-emails", certificateController.sendEmails);
-router.get("/stats", certificateController.getStats);
-router.get("/", certificateController.listCertificates);
-router.get("/:id", certificateController.getCertificateById);
+// All certificate routes require authentication and are organization-scoped.
+router.post("/generate", protect, upload.single("file"), certificateController.generateCertificates);
+router.post("/send-emails", protect, certificateController.sendEmails);
+router.get("/stats", protect, certificateController.getStats);
+router.get("/", protect, certificateController.listCertificates);
+router.get("/:id", protect, certificateController.getCertificateById);
 
 module.exports = router;

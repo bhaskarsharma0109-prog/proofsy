@@ -1,11 +1,24 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const csv = require("csv-parser");
 const { v4: uuidv4 } = require("uuid");
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const Event = require("../models/Event");
 const Certificate = require("../models/Certificate");
+const { getCertificateQueue } = require("../services/certificateQueue");
+
+const MAX_CSV_ROWS = 50000;
+
+/**
+ * Generate a tamper-resistant verification code.
+ * 16 random bytes (128 bits) encoded as base64url ≈ 22 characters.
+ */
+function generateVerificationCode() {
+  const token = crypto.randomBytes(16).toString("base64url").toUpperCase();
+  return `CERT-${token}`;
+}
 
 // POST /api/certificates/generate
 exports.generateCertificates = async (req, res) => {
@@ -21,28 +34,47 @@ exports.generateCertificates = async (req, res) => {
       return res.status(400).json({ success: false, error: "Missing CSV file" });
     }
 
-    // Verify event exists
-    const event = await Event.findById(eventId);
-    if (!event) {
-      return res.status(404).json({ success: false, error: "Event not found" });
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({ success: false, error: "Invalid eventId" });
     }
 
-    // Parse CSV and collect rows
+    // Verify event exists AND belongs to the caller's organization.
+    const event = await Event.findOne({ _id: eventId, organizationId: req.organizationId });
+    if (!event) {
+      return res.status(404).json({ success: false, error: "Event not found or unauthorized" });
+    }
+
+    // Parse CSV and collect rows (with an upper bound to prevent resource abuse)
     const rows = [];
+    let limitExceeded = false;
     await new Promise((resolve, reject) => {
-      fs.createReadStream(file.path)
-        .pipe(csv())
+      const stream = fs.createReadStream(file.path).pipe(csv());
+      stream
         .on("data", (row) => {
+          if (limitExceeded) return;
           if (row.name && row.email) {
+            if (rows.length >= MAX_CSV_ROWS) {
+              limitExceeded = true;
+              stream.destroy();
+              return;
+            }
             rows.push({
-              name: row.name.trim(),
-              email: row.email.trim().toLowerCase(),
+              name: String(row.name).trim().slice(0, 200),
+              email: String(row.email).trim().toLowerCase().slice(0, 320),
             });
           }
         })
         .on("end", resolve)
+        .on("close", resolve)
         .on("error", reject);
     });
+
+    if (limitExceeded) {
+      return res.status(400).json({
+        success: false,
+        error: `CSV exceeds the maximum of ${MAX_CSV_ROWS} rows.`,
+      });
+    }
 
     if (rows.length === 0) {
       return res.status(400).json({
@@ -104,7 +136,8 @@ exports.generateCertificates = async (req, res) => {
         newCertificates.push({
           userId: userId,
           eventId: event._id,
-          verificationCode: `CERT-${uuidv4().slice(0, 8).toUpperCase()}`,
+          organizationId: event.organizationId,
+          verificationCode: generateVerificationCode(),
           status: "pending"
         });
       }
@@ -114,21 +147,32 @@ exports.generateCertificates = async (req, res) => {
     const jobId = uuidv4();
 
     if (newCertificates.length > 0) {
-      // Chunk bulk inserts if extremely large (e.g., > 100k), but insertMany handles 10k perfectly fine
-      const insertedCerts = await Certificate.insertMany(newCertificates, { ordered: false });
-      created = insertedCerts.length;
+      // insertMany handles tens of thousands fine. ordered:false keeps inserting
+      // even if a rare duplicate verification code collides (extremely unlikely
+      // with 128-bit tokens); we count the successful inserts.
+      try {
+        const insertedCerts = await Certificate.insertMany(newCertificates, { ordered: false });
+        created = insertedCerts.length;
+      } catch (insertErr) {
+        // Partial success: BulkWriteError carries the number of inserted docs.
+        created = insertErr.result?.insertedCount ?? insertErr.insertedDocs?.length ?? 0;
+        if (created === 0) throw insertErr;
+      }
     }
 
-    // Push certificate generation to the background worker via Bull/Redis
-    try {
-      const Queue = require("bull");
-      const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
-      const certQueue = new Queue("certificate-generation", REDIS_URL);
-      await certQueue.add({ eventId: event._id.toString() });
-      console.log(`[API] Queued certificate generation for event ${event._id}`);
-    } catch (e) {
-      // Redis unavailable — fall back to synchronous generation
-      console.warn("[API] Redis queue unavailable, generating synchronously:", e.message);
+    // Push certificate generation to the background worker via a singleton Bull
+    // queue. If Redis is unavailable, fall back to synchronous generation.
+    const certQueue = getCertificateQueue();
+    if (certQueue) {
+      try {
+        await certQueue.add({ eventId: event._id.toString() });
+        console.log(`[API] Queued certificate generation for event ${event._id}`);
+      } catch (e) {
+        console.warn("[API] Redis queue unavailable, generating synchronously:", e.message);
+        const { queueCertificateGeneration } = require("../workers/certificateWorker");
+        queueCertificateGeneration(event._id.toString());
+      }
+    } else {
       const { queueCertificateGeneration } = require("../workers/certificateWorker");
       queueCertificateGeneration(event._id.toString());
     }
@@ -152,21 +196,33 @@ exports.generateCertificates = async (req, res) => {
   }
 };
 
-// GET /api/certificates
+// GET /api/certificates?limit=&offset=
 exports.listCertificates = async (req, res) => {
   try {
-    const certificates = await Certificate.find()
-      .populate("userId")
-      .populate("eventId")
-      .sort({ createdAt: -1 });
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
+    const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+
+    const filter = { organizationId: req.organizationId };
+
+    const [total, certificates] = await Promise.all([
+      Certificate.countDocuments(filter),
+      Certificate.find(filter)
+        .populate("userId")
+        .populate("eventId")
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit),
+    ]);
 
     return res.json({
       success: true,
+      pagination: { total, limit, offset },
       data: certificates.map((c) => ({
         id: c._id,
         verificationCode: c.verificationCode,
         recipientName: c.userId?.name || "Unknown",
         recipientEmail: c.userId?.email || "Unknown",
+        eventId: c.eventId?._id || c.eventId || null,
         eventName: c.eventId?.name || "Unknown Event",
         eventDate: c.eventId?.date?.toISOString() || null,
         templateId: c.eventId?.templateId || "modern",
@@ -193,14 +249,14 @@ exports.getCertificateById = async (req, res) => {
       });
     }
 
-    const certificate = await Certificate.findById(id)
+    const certificate = await Certificate.findOne({ _id: id, organizationId: req.organizationId })
       .populate("userId")
       .populate("eventId");
 
     if (!certificate) {
       return res.status(404).json({
         success: false,
-        error: "Certificate not found",
+        error: "Certificate not found or unauthorized",
       });
     }
 
@@ -239,6 +295,12 @@ exports.sendEmails = async (req, res) => {
       return res.status(400).json({ success: false, error: "Invalid eventId" });
     }
 
+    // Ensure the event belongs to the caller's organization before sending.
+    const event = await Event.findOne({ _id: eventId, organizationId: req.organizationId });
+    if (!event) {
+      return res.status(404).json({ success: false, error: "Event not found or unauthorized" });
+    }
+
     const { sendEventEmails } = require("../services/emailService");
     const result = await sendEventEmails(eventId);
 
@@ -256,24 +318,30 @@ exports.sendEmails = async (req, res) => {
 // GET /api/certificates/stats
 exports.getStats = async (req, res) => {
   try {
-    // Run all aggregate counts in parallel
+    const orgId = req.organizationId;
+    const certFilter = { organizationId: orgId };
+    const eventFilter = { organizationId: orgId };
+
+    // Run all aggregate counts in parallel, scoped to the organization.
     const [
       totalCertificates,
       generated,
       pending,
       failed,
       totalEvents,
-      totalUsers,
+      uniqueRecipients,
       recentEvents
     ] = await Promise.all([
-      Certificate.countDocuments(),
-      Certificate.countDocuments({ status: "generated" }),
-      Certificate.countDocuments({ status: "pending" }),
-      Certificate.countDocuments({ status: "failed" }),
-      Event.countDocuments(),
-      User.countDocuments(),
-      Event.find().sort({ createdAt: -1 }).limit(5).lean()
+      Certificate.countDocuments(certFilter),
+      Certificate.countDocuments({ ...certFilter, status: "generated" }),
+      Certificate.countDocuments({ ...certFilter, status: "pending" }),
+      Certificate.countDocuments({ ...certFilter, status: "failed" }),
+      Event.countDocuments(eventFilter),
+      Certificate.distinct("userId", certFilter),
+      Event.find(eventFilter).sort({ createdAt: -1 }).limit(5).lean()
     ]);
+
+    const totalUsers = uniqueRecipients.length;
 
     // Verification rate = generated / total
     const verificationRate = totalCertificates > 0
@@ -300,8 +368,9 @@ exports.getStats = async (req, res) => {
       })
     );
 
-    // Top recipients
+    // Top recipients (scoped to the organization)
     const topRecipients = await Certificate.aggregate([
+      { $match: { organizationId: new mongoose.Types.ObjectId(orgId) } },
       { $group: { _id: "$userId", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 5 },

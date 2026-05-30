@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#fff}
+  .cert{width:1056px;height:746px;position:relative;overflow:hidden;display:flex;flex-direction:column;background:#fff}
+  .header{background:#1E293B;padding:32px 48px;display:flex;align-items:center;justify-content:space-between}
+  .header-brand{font-size:18px;font-weight:700;color:#fff;letter-spacing:0.05em}
+  .header-type{font-size:11px;color:#94A3B8;text-transform:uppercase;letter-spacing:0.2em}
+  .body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 64px}
+  .certify{color:#64748B;font-size:15px}
+  .name-container{margin-top:10px;border-bottom:3px solid #1E293B;padding-bottom:6px;overflow:hidden;width:100%;max-width:650px;text-align:center}
+  .name{font-weight:700;color:#0F172A;white-space:nowrap;line-height:1}
+  .event-label{margin-top:24px;color:#64748B;font-size:15px}
+  .event-name{font-size:24px;font-weight:600;color:#1E293B;margin-top:8px}
+  .duration{font-size:13px;color:#94A3B8;margin-top:4px}
+  .footer-bar{background:#F8FAFC;border-top:1px solid #E2E8F0;padding:20px 48px;display:flex;justify-content:space-between;align-items:center}
+  .footer-item{text-align:center}
+  .footer-item .val{font-size:13px;font-weight:600;color:#0F172A}
+  .footer-item .lbl{font-size:10px;color:#94A3B8;margin-top:2px;text-transform:uppercase}
+  .code-wrap{text-align:center}
+  .qr{width:64px;height:64px;border:2px solid #1E293B;display:flex;align-items:center;justify-content:center;background:#fff;margin:0 auto 6px;padding:4px}
+  .qr img{width:100%;height:100%;object-fit:contain}
+  .code{font-family:monospace;font-size:11px;color:#1E293B;background:#E2E8F0;padding:4px 12px;border-radius:4px;display:inline-block}
+</style></head>
+<body><div class="cert">
+  <div class="header">
+    <div class="header-brand">{{organizer}}</div>
+    <div class="header-type">Certificate of Completion</div>
+  </div>
+  <div class="body">
+    <p class="certify">This is to certify that</p>
+    <div class="name-container"><div class="name" id="recipientName" style="font-size:48px">{{name}}</div></div>
+    <p class="event-label">has successfully completed the</p>
+    <div class="event-name">{{event}}</div>
+    <div class="duration">{{duration}}</div>
+  </div>
+  <div class="footer-bar">
+    <div class="footer-item"><div class="val">{{date}}</div><div class="lbl">Date</div></div>
+    <div class="code-wrap"><div class="qr"><img src="{{qrCodeDataUrl}}" alt="Verification QR" /></div><div class="code">{{verificationCode}}</div></div>
+    <div class="footer-item"><div class="val">{{organizer}}</div><div class="lbl">Issued By</div></div>
+  </div>
+</div>
+<script>(function(){var e=document.getElementById('recipientName'),c=e.parentElement,f=48;e.style.fontSize=f+'px';while(e.scrollWidth>c.clientWidth&&f>16){f--;e.style.fontSize=f+'px'}})()</script>
+</body></html>

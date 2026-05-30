@@ -190,23 +190,30 @@ async function queueCertificateGeneration(eventId) {
     return { success: 0, failed: 0 };
   }
 
-  const pendingCerts = await Certificate.find({ eventId, status: "pending" }).populate("userId");
-  console.log(`[Worker] Found ${pendingCerts.length} pending certificates`);
+  const pendingCount = await Certificate.countDocuments({ eventId, status: "pending" });
+  console.log(`[Worker] Found ${pendingCount} pending certificates`);
 
-  if (pendingCerts.length === 0) return { success: 0, failed: 0 };
-  
+  if (pendingCount === 0) return { success: 0, failed: 0 };
+
   let success = 0;
   let failed = 0;
   let bulkUpdates = [];
-    
-  for (const cert of pendingCerts) {
+
+  // Stream pending certificates with a cursor instead of loading them all into
+  // memory. PDFs are generated one at a time so a single slow op doesn't pin
+  // the entire batch in memory, and updates are flushed in batches of 200.
+  const cursor = Certificate.find({ eventId, status: "pending" })
+    .populate("userId")
+    .cursor();
+
+  for (let cert = await cursor.next(); cert != null; cert = await cursor.next()) {
     try {
       const user = cert.userId;
       if (!user) throw new Error("User missing");
 
       // Generate the PDF
       const pdfUrl = await generatePDFWithPdfLib(template, user, event, cert);
-      
+
       bulkUpdates.push({
         updateOne: {
           filter: { _id: cert._id },
@@ -234,11 +241,11 @@ async function queueCertificateGeneration(eventId) {
       bulkUpdates = [];
     }
   }
-  
+
   if (bulkUpdates.length > 0) {
     await Certificate.bulkWrite(bulkUpdates);
   }
-    
+
   console.log(`[Worker] Done. Success: ${success}, Failed: ${failed}`);
   return { success, failed };
 }

@@ -1,0 +1,12 @@
+[providers.node]
+nodeVersion = "20"
+
+[phases.setup]
+# Install chromium and essential linux libraries required by Puppeteer
+nixPkgs = ["...", "chromium", "nss", "freetype", "harfbuzz", "pango", "xorg.libX11", "xorg.libXext", "xorg.libXrender", "xorg.libICE", "xorg.libSM"]
+aptPkgs = ["...", "libnss3", "libatk1.0-0", "libatk-bridge2.0-0", "libcups2", "libdrm2", "libxkbcommon0", "libxcomposite1", "libxdamage1", "libxrandr2", "libgbm1", "libasound2"]
+
+[variables]
+# Tell Puppeteer to use the system-installed Chromium instead of downloading its own
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
+PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium"

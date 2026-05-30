@@ -22,7 +22,13 @@ const protect = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "proofsy_secret_key");
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        error: "Server authentication is not configured",
+      });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.member = await TeamMember.findById(decoded.id);
     if (!req.member) {

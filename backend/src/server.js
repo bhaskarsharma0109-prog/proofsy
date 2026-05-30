@@ -14,6 +14,7 @@ const morgan = require("morgan");
 const logger = require("./utils/logger");
 const { errorHandler } = require("./middleware/errorHandler");
 const { validateEnv } = require("./utils/envValidator");
+const { closeCertificateQueue } = require("./services/certificateQueue");
 
 // Validate environment variables
 validateEnv();
@@ -23,13 +24,34 @@ const PORT = process.env.PORT || 5000;
 
 // Security middleware
 app.use(helmet());
+
+// CORS: use an explicit allowlist of origins. The previous behaviour treated a
+// raw `CORS_ORIGIN=true` string as a literal origin and fell back to `true`
+// (reflecting any origin) when unset. We now parse a comma-separated allowlist
+// and ignore meaningless values like "true"/"false".
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter((o) => o && o !== "true" && o !== "false");
+
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : true,
+    origin(origin, cb) {
+      // Allow same-origin / non-browser requests (no Origin header).
+      if (!origin) return cb(null, true);
+      // If no allowlist configured, allow all in non-production for local dev.
+      if (allowedOrigins.length === 0) {
+        if (process.env.NODE_ENV === "production") {
+          return cb(new Error("Origin not allowed by CORS"));
+        }
+        return cb(null, true);
+      }
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error("Origin not allowed by CORS"));
+    },
     credentials: true,
   })
 );
-app.use(sanitize);
 
 // Request limiting
 const limiter = rateLimit({
@@ -41,11 +63,24 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
+// Stricter limiter for authentication endpoints to slow brute-force attacks.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === "production" ? 10 : 100,
+  message: "Too many authentication attempts, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Performance middleware
 app.use(cookieParser());
 app.use(compression());
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Body parsing MUST run before sanitization so that req.body is populated when
+// the sanitizer strips dangerous NoSQL operators / HTML from request payloads.
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(sanitize);
 
 // Request logging
 app.use(morgan("dev", {
@@ -56,7 +91,7 @@ app.use(morgan("dev", {
 app.use("/storage", express.static(path.join(__dirname, "../storage")));
 
 // Routes
-app.use("/api/auth", require("./routes/auth"));
+app.use("/api/auth", authLimiter, require("./routes/auth"));
 app.use("/api/events", require("./routes/events"));
 app.use("/api/certificates", require("./routes/certificates"));
 app.use("/api/users", require("./routes/users"));
@@ -140,29 +175,21 @@ async function startServer() {
 }
 
 // Graceful shutdown handling
-process.on('SIGINT', async () => {
-  logger.info('SIGINT received. Shutting down gracefully...');
+async function gracefulShutdown(signal) {
+  logger.info(`${signal} received. Shutting down gracefully...`);
   if (server) {
     server.close();
   }
+  await closeCertificateQueue();
   await mongoose.disconnect();
   if (mongod) {
     await mongod.stop();
   }
   process.exit(0);
-});
+}
 
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received. Shutting down gracefully...');
-  if (server) {
-    server.close();
-  }
-  await mongoose.disconnect();
-  if (mongod) {
-    await mongod.stop();
-  }
-  process.exit(0);
-});
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
 if (require.main === module) {
   startServer().catch((err) => {

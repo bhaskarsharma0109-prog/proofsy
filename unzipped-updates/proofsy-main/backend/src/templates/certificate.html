@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Fira Sans', sans-serif;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .certificate {
+      width: 1056px;
+      height: 746px; /* ~A4 landscape ratio */
+      border: 8px solid oklch(55% 0.18 250);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 64px;
+      background: #fff;
+    }
+
+    .corner-tl {
+      position: absolute; top: 0; left: 0;
+      width: 128px; height: 128px;
+      background: oklch(55% 0.18 250);
+      opacity: 0.08;
+      border-bottom-right-radius: 100%;
+    }
+    .corner-br {
+      position: absolute; bottom: 0; right: 0;
+      width: 192px; height: 192px;
+      background: oklch(65% 0.15 250);
+      opacity: 0.08;
+      border-top-left-radius: 100%;
+    }
+
+    .content {
+      position: relative; z-index: 1;
+      text-align: center;
+      width: 100%;
+      max-width: 780px;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 700;
+      color: oklch(55% 0.18 250);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-top: 8px;
+    }
+
+    .certify-line {
+      color: #666;
+      margin-top: 48px;
+      font-size: 16px;
+    }
+
+    .name-container {
+      margin-top: 16px;
+      border-bottom: 2px solid #e5e5e5;
+      padding-bottom: 8px;
+      overflow: hidden;
+      width: 100%;
+    }
+    .recipient-name {
+      font-weight: 700;
+      color: oklch(25% 0.02 250);
+      white-space: nowrap;
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .event-section {
+      margin-top: 32px;
+    }
+    .event-section p {
+      color: #666;
+      font-size: 16px;
+    }
+    .event-name {
+      font-size: 28px;
+      font-weight: 600;
+      color: oklch(55% 0.18 250);
+      margin-top: 12px;
+    }
+
+    .footer {
+      margin-top: 64px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      width: 100%;
+      padding: 0 48px;
+    }
+    .footer-item {
+      text-align: center;
+    }
+    .footer-item .value {
+      border-top: 1px solid #999;
+      padding-top: 8px;
+      font-weight: 500;
+      color: oklch(25% 0.02 250);
+      font-size: 14px;
+    }
+    .footer-item .label {
+      color: #999;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .qr-box {
+      width: 80px; height: 80px;
+      border: 2px solid oklch(55% 0.18 250);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      margin: 0 auto 8px;
+    }
+    .qr-box span {
+      font-family: 'Fira Code', monospace;
+      font-size: 9px;
+      color: #bbb;
+      transform: rotate(45deg);
+    }
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 4px;
+    }
+    .verification-code {
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      color: oklch(55% 0.18 250);
+    }
+  </style>
+</head>
+<body>
+  <div class="certificate">
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
+
+    <div class="content">
+      <div class="brand">Proofsy</div>
+      <div class="subtitle">Certificate of Completion</div>
+
+      <p class="certify-line">This is to certify that</p>
+      <div class="name-container">
+        <div class="recipient-name" id="recipientName">{{name}}</div>
+      </div>
+
+      <div class="event-section">
+        <p>has successfully completed the</p>
+        <div class="event-name">{{event}}</div>
+      </div>
+
+      <div class="footer">
+        <div class="footer-item">
+          <div class="value">{{date}}</div>
+          <div class="label">Date</div>
+        </div>
+        <div class="footer-item">
+          <div class="qr-box"><img src="{{qrCodeDataUrl}}" alt="Verification QR" /></div>
+          <div class="verification-code">{{verificationCode}}</div>
+        </div>
+        <div class="footer-item">
+          <div class="value">{{organizer}}</div>
+          <div class="label">Organizer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Auto-fit name text
+    (function() {
+      const el = document.getElementById('recipientName');
+      const container = el.parentElement;
+      let fontSize = 56;
+      el.style.fontSize = fontSize + 'px';
+      while (el.scrollWidth > container.clientWidth && fontSize > 18) {
+        fontSize -= 1;
+        el.style.fontSize = fontSize + 'px';
+      }
+    })();
+  </script>
+</body>
+</html>

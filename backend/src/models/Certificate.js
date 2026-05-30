@@ -12,6 +12,12 @@ const CertificateSchema = new mongoose.Schema(
       ref: "Event",
       required: true,
     },
+    organizationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      required: true,
+      index: true,
+    },
     verificationCode: {
       type: String,
       required: true,
@@ -33,5 +39,9 @@ const CertificateSchema = new mongoose.Schema(
 
 // Prevent duplicate certificates for the same user+event
 CertificateSchema.index({ userId: 1, eventId: 1 }, { unique: true });
+// Common query patterns: scope by organization, filter by status, sort by date.
+CertificateSchema.index({ organizationId: 1, createdAt: -1 });
+CertificateSchema.index({ organizationId: 1, status: 1 });
+CertificateSchema.index({ eventId: 1, status: 1 });
 
 module.exports = mongoose.model("Certificate", CertificateSchema);

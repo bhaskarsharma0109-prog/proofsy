@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Common Brand Colors */
+  --color-primary: #2563EB;
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1D4ED8;
+
+  /* CTA */
+  --color-cta: #2563EB;
+  --color-cta-hover: #1D4ED8;
+
+  /* Status Colors */
+  --color-success: #16A34A;
+  --color-error: #DC2626;
+  --color-warning: #D97706;
+
+  /* Typography */
+  --font-sans: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* Light Mode Variables */
+:root {
+  --color-primary-faint: #EFF6FF;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F1F5F9;
+  --color-foreground: #0F172A;
+  --color-muted: #64748B;
+  --color-border: #E2E8F0;
+  --color-border-strong: #CBD5E1;
+  
+  --color-success-bg: #F0FDF4;
+  --color-error-bg: #FEF2F2;
+  --color-warning-bg: #FFFBEB;
+}
+
+/* Dark Mode Variables (System Default) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary-faint: rgba(37, 99, 235, 0.15);
+    --color-background: #0B1120;
+    --color-surface: #1E293B;
+    --color-surface-alt: #0F172A;
+    --color-foreground: #F8FAFC;
+    --color-muted: #94A3B8;
+    --color-border: #334155;
+    --color-border-strong: #475569;
+    
+    --color-success-bg: rgba(22, 163, 74, 0.15);
+    --color-error-bg: rgba(220, 38, 38, 0.15);
+    --color-warning-bg: rgba(217, 119, 6, 0.15);
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lora:wght@400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Lora',serif;display:flex;align-items:center;justify-content:center;height:100vh;background:#fff}
+  .cert{width:1056px;height:746px;border:12px double #8B6914;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;background:#FFFEF7}
+  .inner{border:2px solid #D4A843;position:absolute;inset:20px}
+  .brand{font-family:'Playfair Display',serif;font-size:28px;color:#8B6914;letter-spacing:0.15em;text-transform:uppercase}
+  .subtitle{font-size:14px;color:#999;text-transform:uppercase;letter-spacing:0.2em;margin-top:6px}
+  .certify{color:#666;margin-top:40px;font-size:16px}
+  .name-container{margin-top:12px;border-bottom:2px solid #D4A843;padding-bottom:6px;overflow:hidden;width:100%;max-width:650px}
+  .name{font-family:'Playfair Display',serif;font-weight:700;color:#2C1810;white-space:nowrap;line-height:1}
+  .event-label{margin-top:28px;color:#666;font-size:16px}
+  .event-name{font-family:'Playfair Display',serif;font-size:26px;color:#8B6914;margin-top:8px}
+  .duration{font-size:14px;color:#999;margin-top:6px}
+  .footer{margin-top:50px;display:flex;justify-content:space-between;align-items:flex-end;width:100%;padding:0 40px}
+  .footer-item{text-align:center}
+  .footer-item .val{border-top:1px solid #999;padding-top:6px;font-size:13px;color:#2C1810}
+  .footer-item .lbl{font-size:11px;color:#999;margin-top:3px;text-transform:uppercase;letter-spacing:0.1em}
+  .qr{width:70px;height:70px;border:2px solid #D4A843;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
+  .qr img{width:100%;height:100%;object-fit:contain;padding:4px}
+  .code{font-family:monospace;font-size:10px;color:#8B6914}
+</style></head>
+<body><div class="cert"><div class="inner"></div>
+  <div style="position:relative;z-index:1;text-align:center;width:100%;max-width:700px">
+    <div class="brand">Certificate</div>
+    <div class="subtitle">of Completion</div>
+    <p class="certify">This is to certify that</p>
+    <div class="name-container"><div class="name" id="recipientName" style="font-size:52px">{{name}}</div></div>
+    <p class="event-label">has successfully completed the</p>
+    <div class="event-name">{{event}}</div>
+    <div class="duration">{{duration}}</div>
+    <div class="footer">
+      <div class="footer-item"><div class="val">{{date}}</div><div class="lbl">Date</div></div>
+      <div class="footer-item"><div class="qr"><img src="{{qrCodeDataUrl}}" alt="Verification QR" /></div><div class="code">{{verificationCode}}</div></div>
+      <div class="footer-item"><div class="val">{{organizer}}</div><div class="lbl">Organizer</div></div>
+    </div>
+  </div>
+</div>
+<script>(function(){var e=document.getElementById('recipientName'),c=e.parentElement,f=52;e.style.fontSize=f+'px';while(e.scrollWidth>c.clientWidth&&f>16){f--;e.style.fontSize=f+'px'}})()</script>
+</body></html>

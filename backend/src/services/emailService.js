@@ -11,6 +11,20 @@ const nodemailer = require("nodemailer");
 
 let transporter = null;
 
+/**
+ * Escape dynamic values before interpolating them into email HTML to prevent
+ * HTML/markup injection from recipient or event names.
+ */
+function escapeHtml(value = "") {
+  return String(value).replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[ch]));
+}
+
 async function getTransporter() {
   if (transporter) return transporter;
 
@@ -70,6 +84,14 @@ async function sendCertificateEmail({ recipientName, recipientEmail, eventName, 
     ? new Date(eventDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
     : "N/A";
 
+  // Escape all user-controlled values used in HTML.
+  const safeRecipientName = escapeHtml(recipientName);
+  const safeEventName = escapeHtml(eventName);
+  const safeVerificationCode = escapeHtml(verificationCode);
+  // URLs are encoded via encodeURI to keep attributes safe.
+  const safePdfUrl = pdfUrl ? encodeURI(pdfUrl) : null;
+  const safeVerifyUrl = verifyUrl ? encodeURI(verifyUrl) : "";
+
   const html = `
 <!DOCTYPE html>
 <html>
@@ -90,9 +112,9 @@ async function sendCertificateEmail({ recipientName, recipientEmail, eventName, 
 
     <!-- Body -->
     <div style="padding:32px 24px;">
-      <p style="color:#111;font-size:15px;margin:0 0 16px;">Hi <strong>${recipientName}</strong>,</p>
+      <p style="color:#111;font-size:15px;margin:0 0 16px;">Hi <strong>${safeRecipientName}</strong>,</p>
       <p style="color:#374151;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        Congratulations! Your credential for <strong>${eventName}</strong> has been issued and is ready for download.
+        Congratulations! Your credential for <strong>${safeEventName}</strong> has been issued and is ready for download.
       </p>
 
       <!-- Info cards -->
@@ -100,7 +122,7 @@ async function sendCertificateEmail({ recipientName, recipientEmail, eventName, 
         <table style="width:100%;border-collapse:collapse;">
           <tr>
             <td style="padding:4px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;">Event</td>
-            <td style="padding:4px 0;color:#111;font-size:14px;font-weight:600;text-align:right;">${eventName}</td>
+            <td style="padding:4px 0;color:#111;font-size:14px;font-weight:600;text-align:right;">${safeEventName}</td>
           </tr>
           <tr>
             <td style="padding:4px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;">Date</td>
@@ -108,19 +130,19 @@ async function sendCertificateEmail({ recipientName, recipientEmail, eventName, 
           </tr>
           <tr>
             <td style="padding:4px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;">Code</td>
-            <td style="padding:4px 0;color:#4F46E5;font-size:14px;font-weight:700;font-family:monospace;text-align:right;">${verificationCode}</td>
+            <td style="padding:4px 0;color:#4F46E5;font-size:14px;font-weight:700;font-family:monospace;text-align:right;">${safeVerificationCode}</td>
           </tr>
         </table>
       </div>
 
       <!-- CTA buttons -->
-      ${pdfUrl ? `
-      <a href="${pdfUrl}" style="display:block;background:#4F46E5;color:#fff;text-align:center;padding:14px 24px;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;margin:0 0 12px;">
+      ${safePdfUrl ? `
+      <a href="${safePdfUrl}" style="display:block;background:#4F46E5;color:#fff;text-align:center;padding:14px 24px;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;margin:0 0 12px;">
         Download Certificate PDF
       </a>
       ` : ""}
 
-      <a href="${verifyUrl}" style="display:block;background:#fff;color:#4F46E5;text-align:center;padding:14px 24px;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;border:2px solid #4F46E5;">
+      <a href="${safeVerifyUrl}" style="display:block;background:#fff;color:#4F46E5;text-align:center;padding:14px 24px;border-radius:12px;text-decoration:none;font-size:14px;font-weight:600;border:2px solid #4F46E5;">
         Verify Certificate
       </a>
     </div>
@@ -164,7 +186,10 @@ async function sendEventEmails(eventId) {
   const certs = await Certificate.find({ eventId, status: "generated" }).populate("userId");
 
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-  const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
+  // Public, browser-reachable base URL for storage links. The frontend proxies
+  // /storage to the backend, so links should be built from the public app URL
+  // (PUBLIC_APP_URL), falling back to FRONTEND_URL, not the internal BACKEND_URL.
+  const publicUrl = process.env.PUBLIC_APP_URL || process.env.FRONTEND_URL || "http://localhost:3000";
 
   let sent = 0;
   let failed = 0;
@@ -179,7 +204,7 @@ async function sendEventEmails(eventId) {
         eventName: event.name,
         eventDate: event.date,
         verificationCode: cert.verificationCode,
-        pdfUrl: cert.pdfUrl ? `${backendUrl}${cert.pdfUrl}` : null,
+        pdfUrl: cert.pdfUrl ? `${publicUrl}${cert.pdfUrl}` : null,
         verifyUrl: `${frontendUrl}/verify?code=${encodeURIComponent(cert.verificationCode)}`,
       });
       sent++;
