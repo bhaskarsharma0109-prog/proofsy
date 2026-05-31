@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 
@@ -34,6 +35,23 @@ async function request<T>(path: string, options?: RequestInit): Promise<ApiRespo
     // Only set application/json if it's NOT FormData
     if (!isFormData && !headers["Content-Type"]) {
       headers["Content-Type"] = "application/json";
+    }
+
+    const workspaceId = typeof window !== "undefined" ? localStorage.getItem("proofsy_workspace_id") : null;
+    if (workspaceId) {
+      headers["x-workspace-id"] = workspaceId;
+    }
+
+    if (typeof window !== "undefined") {
+      const recipientToken = localStorage.getItem("proofsy_recipient_token");
+      const adminToken = localStorage.getItem("proofsy_admin_token");
+      if (path.includes("/recipient") || path.includes("/auth/recipient")) {
+        if (recipientToken) {
+          headers["Authorization"] = `Bearer ${recipientToken}`;
+        }
+      } else if (adminToken) {
+        headers["Authorization"] = `Bearer ${adminToken}`;
+      }
     }
 
     const res = await fetchWithTimeout(`${API_BASE}${path}`, {
@@ -86,6 +104,8 @@ export interface CertificateData {
   eventDate: string | null;
   templateId: string;
   pdfUrl: string | null;
+  pngUrl?: string | null;
+  svgUrl?: string | null;
   status: "pending" | "generated" | "failed";
   issuedAt: string;
 }
@@ -96,7 +116,16 @@ export interface CertificateDetailData extends CertificateData {
 }
 
 export interface RecipientPortalData {
-  user: { name: string; email: string };
+  user: {
+    name: string;
+    email: string;
+    bio?: string;
+    profilePhoto?: string;
+    linkedinUrl?: string;
+    twitterHandle?: string;
+    portfolioTitle?: string;
+    isPublicProfile?: boolean;
+  };
   totalEventsAttended: number;
   certificates: Array<{
     id: string;
@@ -106,6 +135,7 @@ export interface RecipientPortalData {
     verificationCode: string;
     pdfUrl: string | null;
     issuedAt: string;
+    linkedInAddUrl?: string;
   }>;
 }
 
@@ -133,12 +163,67 @@ export interface StatsData {
   }>;
 }
 
+export interface VerificationAnalyticsData {
+  totalVerifications: number;
+  referrals: {
+    linkedin: number;
+    twitter: number;
+    qr: number;
+    direct: number;
+    offline: number;
+  };
+  devices: {
+    desktop: number;
+    mobile: number;
+    tablet: number;
+  };
+  osBreakdown: Array<{ name: string; count: number }>;
+  timeline: Array<{
+    date: string;
+    label: string;
+    count: number;
+  }>;
+  recentAudits: Array<{
+    id: string;
+    verificationCode: string;
+    recipientName: string;
+    eventName: string;
+    referralSource: "linkedin" | "twitter" | "qr" | "direct" | "offline";
+    browser: string;
+    os: string;
+    deviceType: string;
+    timestamp: string;
+  }>;
+}
+
 export interface UserLookupData {
   id: string;
   name: string;
   email: string;
   totalCertificates: number;
   totalEventsAttended: number;
+}
+
+export interface CustomFontData {
+  id: string;
+  name: string;
+  family: string;
+  fontWeight: "normal" | "bold";
+  fontUrl: string;
+  createdAt: string;
+}
+
+export interface AuditLogData {
+  id: string;
+  actorName: string;
+  actorEmail: string;
+  action: string;
+  targetId: string | null;
+  targetModel: string | null;
+  description: string;
+  ipAddress: string;
+  userAgent: string;
+  createdAt: string;
 }
 
 export const api = {
@@ -182,6 +267,51 @@ export const api = {
   getStats: () =>
     request<StatsData>("/certificates/stats"),
 
+  getVerificationAnalytics: () =>
+    request<VerificationAnalyticsData>("/certificates/verification-analytics"),
+
+  retryCertificate: (id: string) =>
+    request<{ success: boolean; message?: string }>(`/certificates/${encodeURIComponent(id)}/retry`, {
+      method: "POST",
+    }),
+
+  // Integrations
+  getIntegrations: () => request<Record<string, unknown>>("/integrations"),
+  updateZapierIntegration: (connected: boolean, webhookUrl?: string) =>
+    request<Record<string, unknown>>("/integrations/zapier", {
+      method: "PUT",
+      body: JSON.stringify({ connected, webhookUrl }),
+    }),
+  updateGoogleSheetsIntegration: (connected: boolean, sheetUrl?: string) =>
+    request<Record<string, unknown>>("/integrations/google-sheets", {
+      method: "PUT",
+      body: JSON.stringify({ connected, sheetUrl }),
+    }),
+  updateRestApiIntegration: (connected: boolean, regenerate?: boolean) =>
+    request<Record<string, unknown>>("/integrations/rest-api", {
+      method: "PUT",
+      body: JSON.stringify({ connected, regenerate }),
+    }),
+  updateSlackIntegration: (connected: boolean, webhookUrl?: string) =>
+    request<Record<string, unknown>>("/integrations/slack", {
+      method: "PUT",
+      body: JSON.stringify({ connected, webhookUrl }),
+    }),
+  getGoogleSheetsPreview: (eventId: string) =>
+    request<{
+      sheetUrl: string;
+      totalCount: number;
+      recipients: Array<{ name: string; email: string }>;
+    }>(`/events/${encodeURIComponent(eventId)}/google-sheets/preview`),
+  importGoogleSheets: (eventId: string) =>
+    request<{
+      success: boolean;
+      message: string;
+      data: { jobId: string; totalRowsProcessed: number };
+    }>(`/events/${encodeURIComponent(eventId)}/google-sheets/import`, {
+      method: "POST",
+    }),
+
   // Users
   listUsers: () =>
     request<UserLookupData[]>("/users"),
@@ -189,8 +319,8 @@ export const api = {
   getUserByEmail: (email: string) =>
     request<UserLookupData>(`/users/${encodeURIComponent(email)}`),
 
-  getUserCertificates: (email: string) =>
-    request<RecipientPortalData>(`/users/${encodeURIComponent(email)}/certificates`),
+  getUserCertificates: () =>
+    request<RecipientPortalData>(`/auth/recipient/certificates`),
 
   // Verify
   verifyCertificate: (code: string) =>
@@ -202,8 +332,17 @@ export const api = {
         eventDate: string | null;
         issuedAt: string;
         pdfUrl: string | null;
+        pngUrl?: string | null;
+        svgUrl?: string | null;
+        cryptographicSignature: string | null;
+        isCryptographicallyVerified: boolean;
       };
     }>(`/verify/${encodeURIComponent(code)}`),
+
+  getPublicKey: () =>
+    request<{
+      publicKey: string;
+    }>("/verify/public-key"),
 
   // Send Emails
   sendEmails: (eventId: string) =>
@@ -242,8 +381,64 @@ export const api = {
   // Auth
   register: (body: any) => request<any>("/auth/register", { method: "POST", body: JSON.stringify(body) }),
   login: (body: any) => request<any>("/auth/login", { method: "POST", body: JSON.stringify(body) }),
+  demoLogin: () => request<any>("/auth/demo", { method: "POST" }),
   logout: () => request<any>("/auth/logout", { method: "POST" }),
   me: () => request<any>("/auth/me"),
+  
+  // Recipient Auth
+  recipientRegister: (body: { name: string; email: string }) => request<any>("/auth/recipient/register", { method: "POST", body: JSON.stringify(body) }),
+  requestRecipientOTP: (email: string) => request<any>("/auth/recipient/login", { method: "POST", body: JSON.stringify({ email }) }),
+  verifyRecipientOTP: (email: string, otp: string) => request<any>("/auth/recipient/verify", { method: "POST", body: JSON.stringify({ email, otp }) }),
+  recipientMe: () => request<any>("/auth/recipient/me"),
+  recipientLogout: () => request<any>("/auth/recipient/logout", { method: "POST" }),
+  updateRecipientProfile: (body: {
+    name?: string;
+    bio?: string;
+    profilePhoto?: string;
+    linkedinUrl?: string;
+    twitterHandle?: string;
+    portfolioTitle?: string;
+    isPublicProfile?: boolean;
+  }) => request<any>("/auth/recipient/profile", { method: "PUT", body: JSON.stringify(body) }),
+  getPublicRecipientProfile: (email: string) => request<RecipientPortalData>(`/auth/recipient/public/${encodeURIComponent(email)}`),
+
+  // Workspaces
+  listWorkspaces: () => request<any>("/workspaces"),
+  createWorkspace: (name: string, slug?: string) => request<any>("/workspaces", { method: "POST", body: JSON.stringify({ name, slug }) }),
+  inviteWorkspaceMember: (workspaceId: string, data: any) => request<any>(`/workspaces/${workspaceId}/invite`, { method: "POST", body: JSON.stringify(data) }),
+  updateWorkspaceSmtp: (workspaceId: string, data: any) => request<any>(`/workspaces/${workspaceId}/smtp`, { method: "PUT", body: JSON.stringify(data) }),
+  listWorkspaceMembers: (workspaceId: string) => request<any>(`/workspaces/${workspaceId}/members`),
+  initiatePayment: (plan: string) => request<any>("/billing/pay", { method: "POST", body: JSON.stringify({ plan }) }),
+  getTransactionStatus: (txnId: string, mock?: boolean) => request<any>(`/billing/status/${txnId}?mock=${mock ? "true" : "false"}`),
+
+  // Custom Fonts
+  getCustomFonts: () => request<CustomFontData[]>("/custom-fonts"),
+  uploadCustomFont: (formData: FormData) =>
+    request<CustomFontData>("/custom-fonts", {
+      method: "POST",
+      body: formData,
+    }),
+  deleteCustomFont: (id: string) =>
+    request<{ success: boolean; message?: string }>(`/custom-fonts/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
+
+  // Audit Logs
+  getAuditLogs: (filters?: { action?: string; actorEmail?: string; search?: string }) => {
+    let query = "";
+    if (filters) {
+      const params = new URLSearchParams();
+      if (filters.action) params.append("action", filters.action);
+      if (filters.actorEmail) params.append("actorEmail", filters.actorEmail);
+      if (filters.search) params.append("search", filters.search);
+      query = `?${params.toString()}`;
+    }
+    return request<{
+      success: boolean;
+      pagination: { total: number; limit: number; offset: number };
+      data: AuditLogData[];
+    }>(`/audit-logs${query}`);
+  },
 };
 
 // Template types

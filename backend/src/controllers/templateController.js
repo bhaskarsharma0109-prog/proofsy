@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const Template = require("../models/Template");
+const auditService = require("../services/auditService");
 
 const TEMPLATES_DIR = path.join(__dirname, "../../storage/templates");
 
@@ -9,6 +10,20 @@ const TEMPLATES_DIR = path.join(__dirname, "../../storage/templates");
 if (!fs.existsSync(TEMPLATES_DIR)) {
   fs.mkdirSync(TEMPLATES_DIR, { recursive: true });
 }
+
+// Helper to move files across device boundaries (essential for Docker volumes)
+const safeMove = (src, dest) => {
+  try {
+    fs.renameSync(src, dest);
+  } catch (err) {
+    if (err.code === "EXDEV") {
+      fs.copyFileSync(src, dest);
+      fs.unlinkSync(src);
+    } else {
+      throw err;
+    }
+  }
+};
 
 // POST /api/templates — Create a new template
 exports.createTemplate = async (req, res) => {
@@ -29,7 +44,7 @@ exports.createTemplate = async (req, res) => {
     const destPath = path.join(TEMPLATES_DIR, fileName);
 
     // Move file from uploads to templates storage
-    fs.renameSync(file.path, destPath);
+    safeMove(file.path, destPath);
 
     const template = await Template.create({
       name,
@@ -40,7 +55,10 @@ exports.createTemplate = async (req, res) => {
       textLayers: textLayers ? JSON.parse(textLayers) : [],
       qrCode: qrCode ? JSON.parse(qrCode) : undefined,
       organizationId: req.organizationId,
+      workspaceId: req.workspaceId,
     });
+
+    await auditService.logAction(req, "template_created", template._id, "Template", `Created event template "${template.name}"`);
 
     return res.status(201).json({
       success: true,
@@ -56,7 +74,7 @@ exports.createTemplate = async (req, res) => {
 exports.listTemplates = async (req, res) => {
   try {
     const templates = await Template.find({
-      $or: [{ organizationId: req.organizationId }, { isStarter: true }],
+      $or: [{ workspaceId: req.workspaceId }, { isStarter: true }],
     })
       .sort({ isStarter: -1, createdAt: -1 })
       .lean();
@@ -93,7 +111,7 @@ exports.getTemplate = async (req, res) => {
 
     const template = await Template.findOne({
       _id: id,
-      $or: [{ organizationId: req.organizationId }, { isStarter: true }],
+      $or: [{ workspaceId: req.workspaceId }, { isStarter: true }],
     });
     if (!template) {
       return res.status(404).json({ success: false, error: "Template not found or unauthorized" });
@@ -121,7 +139,7 @@ exports.updateTemplate = async (req, res) => {
 
     const template = await Template.findOne({
       _id: id,
-      organizationId: req.organizationId,
+      $or: [{ workspaceId: req.workspaceId }, { isStarter: true }],
     });
     if (!template) {
       return res.status(404).json({ success: false, error: "Template not found or unauthorized" });
@@ -132,13 +150,15 @@ exports.updateTemplate = async (req, res) => {
     if (qrCode) template.qrCode = qrCode;
     if (width) template.width = width;
     if (height) template.height = height;
+    if (req.body.backgroundUrl) template.backgroundUrl = req.body.backgroundUrl;
+    if (req.body.backgroundType) template.backgroundType = req.body.backgroundType;
 
     // If a new background file is uploaded, replace the old one
     if (req.file) {
       const ext = path.extname(req.file.originalname).toLowerCase();
       const fileName = `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
       const destPath = path.join(TEMPLATES_DIR, fileName);
-      fs.renameSync(req.file.path, destPath);
+      safeMove(req.file.path, destPath);
 
       // Delete old background
       const oldPath = path.join(__dirname, "../..", template.backgroundUrl);
@@ -151,6 +171,8 @@ exports.updateTemplate = async (req, res) => {
     }
 
     await template.save();
+
+    await auditService.logAction(req, "template_updated", template._id, "Template", `Updated event template "${template.name}"`);
 
     return res.json({
       success: true,
@@ -173,7 +195,7 @@ exports.deleteTemplate = async (req, res) => {
 
     const template = await Template.findOne({
       _id: id,
-      organizationId: req.organizationId,
+      workspaceId: req.workspaceId,
     });
     if (!template) {
       return res.status(404).json({ success: false, error: "Template not found or unauthorized" });
@@ -190,6 +212,8 @@ exports.deleteTemplate = async (req, res) => {
     }
 
     await Template.findByIdAndDelete(id);
+
+    await auditService.logAction(req, "template_deleted", id, "Template", `Deleted event template "${template.name}"`);
 
     return res.json({
       success: true,

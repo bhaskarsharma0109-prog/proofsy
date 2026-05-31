@@ -11,7 +11,6 @@ import {
   onboardingSteps,
   readOnboardingState,
   subscribeToOnboarding,
-  trackOnboarding,
 } from "@/lib/onboarding";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -113,6 +112,38 @@ const navSections = [
       },
     ],
   },
+  {
+    title: "Management",
+    items: [
+      {
+        label: "Departments / Clubs",
+        href: "/workspaces",
+        icon: (
+          <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h18" />
+          </svg>
+        ),
+      },
+      {
+        label: "Team Coordinators",
+        href: "/team",
+        icon: (
+          <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+          </svg>
+        ),
+      },
+      {
+        label: "Compliance Ledger",
+        href: "/compliance",
+        icon: (
+          <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z" />
+          </svg>
+        ),
+      },
+    ],
+  },
 ];
 
 export default function Sidebar() {
@@ -126,19 +157,37 @@ export default function Sidebar() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const { member, logout } = useAuth();
 
+  const [workspacesOpen, setWorkspacesOpen] = useState(false);
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
+  const [activeWorkspace, setActiveWorkspace] = useState<any | null>(null);
+
+  useEffect(() => {
+    async function loadWorkspaces() {
+      if (!member) return;
+      const res = await api.listWorkspaces();
+      if (res.success && res.data) {
+        setWorkspaces(res.data);
+        const storedId = localStorage.getItem("proofsy_workspace_id");
+        const active = res.data.find((w: any) => w._id === storedId) || res.data[0] || null;
+        setActiveWorkspace(active);
+        if (active && storedId !== active._id) {
+          localStorage.setItem("proofsy_workspace_id", active._id);
+        }
+      }
+    }
+    loadWorkspaces();
+  }, [member]);
+
+  const handleSelectWorkspace = (workspace: any) => {
+    localStorage.setItem("proofsy_workspace_id", workspace._id);
+    setActiveWorkspace(workspace);
+    setWorkspacesOpen(false);
+    window.location.reload();
+  };
+
   useEffect(() => {
     return subscribeToOnboarding(() => setOnboarding(readOnboardingState()));
   }, []);
-
-  useEffect(() => {
-    if (pathname.startsWith("/templates") || pathname.startsWith("/credential-templates")) {
-      trackOnboarding("viewedTemplates");
-    }
-
-    if (pathname.startsWith("/analytics")) {
-      trackOnboarding("viewedAnalytics");
-    }
-  }, [pathname]);
 
   useEffect(() => {
     let active = true;
@@ -151,11 +200,9 @@ export default function Sidebar() {
     }
 
     loadStats();
-    const timer = window.setInterval(loadStats, 15000);
 
     return () => {
       active = false;
-      window.clearInterval(timer);
     };
   }, []);
 
@@ -167,6 +214,10 @@ export default function Sidebar() {
     }
 
     if ((stats?.totalCertificates || 0) > 0) {
+      current.addedRecipients = true;
+    }
+
+    if ((stats?.generated || 0) > 0) {
       current.issuedCredentials = true;
     }
 
@@ -176,26 +227,86 @@ export default function Sidebar() {
   const completedCount = onboardingSteps.filter((step) => completed[step.id]).length;
   const progress = Math.round((completedCount / onboardingSteps.length) * 100);
   const nextStep = onboardingSteps.find((step) => !completed[step.id]) || onboardingSteps[onboardingSteps.length - 1];
-  const usageCount = stats?.totalCertificates || 0;
-  const usageLimit = 250;
-  const usageProgress = Math.min(100, Math.round((usageCount / usageLimit) * 100));
+  const remainingCredits = activeWorkspace?.plan === "annual-pass" ? "Unlimited" : (activeWorkspace?.credits ?? 250);
+  const planLimit = activeWorkspace?.plan === "mega-pass" ? 3000 : activeWorkspace?.plan === "fest-pass" ? 1000 : 250;
+  const usageProgress = typeof remainingCredits === "number" ? Math.min(100, Math.round((remainingCredits / planLimit) * 100)) : 100;
 
   return (
     <>
       <aside className="w-[260px] bg-[var(--color-surface)] border-r border-[var(--color-border)] flex flex-col min-h-screen shrink-0">
-        {/* Brand */}
-        <div className="px-4 py-4 border-b border-[var(--color-border)]">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center shrink-0">
-              <Image src="/logo.svg" alt="Proofsy" width={36} height={36} className="object-contain" />
+        {/* Brand / Workspace Switcher */}
+        <div className="relative px-4 py-4 border-b border-[var(--color-border)]">
+          <button
+            onClick={() => setWorkspacesOpen(!workspacesOpen)}
+            className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-[var(--color-surface-alt)] transition-all text-left cursor-pointer group"
+          >
+            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shrink-0 bg-[var(--color-primary-faint)] text-[var(--color-primary)] font-bold text-sm">
+              {activeWorkspace?.name?.slice(0, 2).toUpperCase() || "PR"}
             </div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-[17px] font-bold text-[var(--color-foreground)] leading-none">Proofsy</h1>
-              <svg className="w-3.5 h-3.5 text-[var(--color-muted)] opacity-60" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-              </svg>
+            <div className="flex-1 truncate">
+              <h1 className="text-[14px] font-bold text-[var(--color-foreground)] leading-none truncate mb-0.5">
+                {activeWorkspace?.name || "Demo Symposium"}
+              </h1>
+              <p className="text-[10px] text-[var(--color-muted)] truncate leading-none">
+                {member?.role === "owner" ? "College Owner" : member?.role === "admin" ? "Dept Admin" : member?.role === "editor" ? "Student Lead" : "Coordinator"}
+              </p>
             </div>
-          </Link>
+            <svg
+              className={`w-4 h-4 text-[var(--color-muted)] transition-transform duration-200 shrink-0 ${workspacesOpen ? "rotate-180" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+
+          {/* Switcher Dropdown */}
+          {workspacesOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setWorkspacesOpen(false)} />
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="absolute left-4 right-4 top-16 z-50 bg-[var(--color-surface)] border border-[var(--color-border)] shadow-xl rounded-xl p-2.5 flex flex-col gap-1 max-h-[300px] overflow-y-auto"
+              >
+                <div className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--color-muted)]">
+                  Switch Workspace
+                </div>
+                {workspaces.map((w) => (
+                  <button
+                    key={w._id}
+                    onClick={() => handleSelectWorkspace(w)}
+                    className={`w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-left transition-colors cursor-pointer text-xs
+                      ${w._id === activeWorkspace?._id
+                        ? "bg-[var(--color-primary-faint)] text-[var(--color-primary)] font-semibold"
+                        : "text-[var(--color-foreground)] hover:bg-[var(--color-surface-alt)]"
+                      }`}
+                  >
+                    <div className="w-5 h-5 rounded bg-[var(--color-surface-alt)] border border-[var(--color-border)] text-[9px] font-bold flex items-center justify-center shrink-0">
+                      {w.name.slice(0, 2).toUpperCase()}
+                    </div>
+                    <span className="truncate flex-1">{w.name}</span>
+                    {w._id === activeWorkspace?._id && <span className="text-[10px]">✓</span>}
+                  </button>
+                ))}
+                
+                {member?.role === "owner" && (
+                  <>
+                    <div className="border-t border-[var(--color-border)] my-1.5" />
+                    <Link
+                      href="/workspaces"
+                      onClick={() => setWorkspacesOpen(false)}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-xs text-[var(--color-primary)] hover:bg-[var(--color-primary-faint)] transition-colors cursor-pointer font-medium"
+                    >
+                      <span>+ Create Department/Club</span>
+                    </Link>
+                  </>
+                )}
+              </motion.div>
+            </>
+          )}
         </div>
 
         {/* Quick Search */}
@@ -360,8 +471,8 @@ export default function Sidebar() {
           {/* Credential Usage */}
           <div className="px-4 py-2 border-t border-[var(--color-border)]">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-[var(--color-muted)]">Credential Usage</span>
-              <span className="text-[11px] font-semibold text-[var(--color-foreground)] tabular-nums">{usageCount} / {usageLimit}</span>
+              <span className="text-[11px] text-[var(--color-muted)]">Remaining Credits</span>
+              <span className="text-[11px] font-semibold text-[var(--color-foreground)] tabular-nums">{remainingCredits} / {planLimit}</span>
             </div>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-surface-alt)]">
               <div className="h-full rounded-full bg-[var(--color-success)] transition-all duration-500" style={{ width: `${usageProgress}%` }} />
@@ -369,12 +480,12 @@ export default function Sidebar() {
           </div>
           {/* Upgrade */}
           <div className="px-4 pb-4 pt-1">
-            <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--color-border)] text-[13px] font-semibold text-[var(--color-foreground)] hover:bg-[var(--color-surface-alt)] cursor-pointer">
+            <Link href="/billing" className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--color-border)] text-[13px] font-semibold text-[var(--color-foreground)] hover:bg-[var(--color-surface-alt)] cursor-pointer">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
               </svg>
-              Upgrade
-            </button>
+              Upgrade Plan
+            </Link>
           </div>
 
           {/* User Profile & Logout */}

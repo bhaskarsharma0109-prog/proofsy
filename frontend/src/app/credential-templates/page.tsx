@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import Link from "next/link";
 import { TEMPLATE_DEFINITIONS } from "@/lib/templates";
-import { trackOnboarding } from "@/lib/onboarding";
 import { pageVariants, staggerContainer, fadeUp, headerSlide, cardHover, pulseGlow } from "@/lib/animations";
 
 export default function CredentialTemplatesPage() {
@@ -103,10 +102,6 @@ export default function CredentialTemplatesPage() {
                   </Link>
                   <Link
                     href={`/events/new?template=${encodeURIComponent(t.id)}`}
-                    onClick={() => {
-                      trackOnboarding("viewedTemplates");
-                      trackOnboarding("selectedTemplate");
-                    }}
                     className="bg-[var(--color-primary)] text-white px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-[var(--color-primary-dark)] cursor-pointer flex items-center gap-1.5"
                   >
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>

@@ -2,6 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
     return [
@@ -14,12 +20,6 @@ const nextConfig: NextConfig = {
         destination: `${backendUrl}/storage/:path*`,
       },
     ];
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
   },
 };
 

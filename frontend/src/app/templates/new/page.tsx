@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
@@ -23,9 +23,16 @@ export default function NewTemplatePage() {
 
   const handleFileSelect = (f: File) => {
     setFile(f);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(f));
     setError(null);
   };
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleUpload = async () => {
     if (!name.trim()) {
@@ -147,11 +154,23 @@ export default function NewTemplatePage() {
                 >
                   {previewUrl ? (
                     <div>
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="max-h-48 mx-auto rounded-lg shadow mb-3"
-                      />
+                      {file?.type === "application/pdf" ? (
+                        <object
+                          data={previewUrl}
+                          type="application/pdf"
+                          className="w-full max-h-48 mx-auto rounded-lg shadow mb-3 overflow-hidden"
+                        >
+                          <div className="p-4 bg-[var(--color-surface-alt)] rounded-lg text-sm">
+                            PDF Preview available after upload.
+                          </div>
+                        </object>
+                      ) : (
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="max-h-48 mx-auto rounded-lg shadow mb-3"
+                        />
+                      )}
                       <p className="text-sm text-[var(--color-foreground)] font-medium">
                         {file?.name}
                       </p>

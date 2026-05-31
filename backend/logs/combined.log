@@ -221,3 +221,342 @@
 {"level":"info","message":"\u001b[0mGET /api/certificates/stats \u001b[32m200\u001b[0m 10.861 ms - -\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-11 16:19:01"}
 {"level":"info","message":"\u001b[0mGET /api/certificates/stats \u001b[36m304\u001b[0m 8.803 ms - -\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-11 16:19:37"}
 {"level":"info","message":"\u001b[0mGET /api/certificates/stats \u001b[32m200\u001b[0m 17.270 ms - -\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-11 16:20:34"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-30 10:07:16"}
+{"level":"info","message":"\u001b[0mPOST /api/users \u001b[33m401\u001b[0m 2.011 ms - 63\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-30 10:07:18"}
+{"level":"info","message":"\u001b[0mGET /api/verify/INVALID-CODE-123 \u001b[33m404\u001b[0m 24.261 ms - 79\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-30 10:07:18"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-30 10:07:53"}
+{"level":"info","message":"\u001b[0mPOST /api/users \u001b[32m201\u001b[0m 37.560 ms - 102\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-30 10:07:54"}
+{"level":"info","message":"\u001b[0mPOST /api/users \u001b[33m409\u001b[0m 9.915 ms - 47\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-30 10:07:54"}
+{"level":"info","message":"\u001b[0mGET /api/verify/INVALID-CODE-123 \u001b[33m404\u001b[0m 3.777 ms - 79\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-30 10:07:54"}
+{"level":"info","message":"\u001b[0mGET /api/verify/VALID-123 \u001b[32m200\u001b[0m 14.410 ms - 199\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-30 10:07:54"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[33m400\u001b[0m 28.028 ms - 83\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-30 10:07:54"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:27:58"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:28:28"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:56948/","service":"proofsy-backend","timestamp":"2026-05-31 16:28:29"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:28:29"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:28:29"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:29:56"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:30:26"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:63549/","service":"proofsy-backend","timestamp":"2026-05-31 16:30:27"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:30:27"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:30:27"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 97.038 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:30:38"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 26.919 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:30:39"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 18.240 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:30:39"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 5.119 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:30:39"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 16.259 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:30:39"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[0m-\u001b[0m - ms - -\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:31:22"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:31:47"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:32:17"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:55839/","service":"proofsy-backend","timestamp":"2026-05-31 16:32:17"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:32:17"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:32:17"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 95.526 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:37"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 26.620 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:37"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 9.468 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:37"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 4.830 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:37"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 8.713 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:37"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 500.321 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:38"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 16.323 ms - 295\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:38"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c154d705b174e0e28bc48 \u001b[33m404\u001b[0m 132.003 ms - 62\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:38"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c154d705b174e0e28bc68/retry \u001b[32m200\u001b[0m 13.063 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:38"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c154d705b174e0e28bc68 \u001b[32m200\u001b[0m 6.021 ms - 410\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:32:43"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:32:58"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:33:36"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:34:06"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:63490/","service":"proofsy-backend","timestamp":"2026-05-31 16:34:07"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:34:07"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:34:07"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 90.635 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:27"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 23.103 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:27"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 8.544 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:27"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 4.164 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:27"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 9.382 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:27"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 343.626 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:28"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 12.960 ms - 295\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:28"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c15bb6c3283c66a070eec \u001b[33m404\u001b[0m 71.575 ms - 62\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:28"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c15bb6c3283c66a070f06/retry \u001b[32m200\u001b[0m 10.149 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:28"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c15bb6c3283c66a070f06 \u001b[32m200\u001b[0m 7.103 ms - 966\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:33"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c15bb6c3283c66a070eec \u001b[33m404\u001b[0m 3.590 ms - 62\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:33"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c15bb6c3283c66a070f06/retry \u001b[32m200\u001b[0m 5.404 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:33"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c15bb6c3283c66a070f06 \u001b[32m200\u001b[0m 6.414 ms - 443\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:34:38"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:34:59"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:35:29"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:55421/","service":"proofsy-backend","timestamp":"2026-05-31 16:35:30"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:35:30"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:35:30"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:36:39"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:37:09"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:59049/","service":"proofsy-backend","timestamp":"2026-05-31 16:37:10"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:37:10"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:37:10"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 89.780 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:31"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 22.090 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:31"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 8.243 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:31"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 4.682 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:31"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 8.120 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:31"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 330.279 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:31"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 19.942 ms - 295\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:31"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c1673799b3399c2a8fd1e \u001b[32m200\u001b[0m 10.084 ms - 1489\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:32"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c1673799b3399c2a8fd3e/retry \u001b[32m200\u001b[0m 9.977 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:32"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c1673799b3399c2a8fd3e \u001b[32m200\u001b[0m 6.777 ms - 966\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:37"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c1673799b3399c2a8fd1e \u001b[32m200\u001b[0m 5.351 ms - 1489\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:37"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c1673799b3399c2a8fd3e/retry \u001b[32m200\u001b[0m 5.090 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:37"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c1673799b3399c2a8fd3e \u001b[32m200\u001b[0m 6.704 ms - 443\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:37:42"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:38:25"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:38:55"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:61016/","service":"proofsy-backend","timestamp":"2026-05-31 16:38:55"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:38:55"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:38:55"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 93.969 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:17"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 24.137 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:17"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 7.717 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:17"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 4.004 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:17"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 7.468 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:17"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 336.700 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:17"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 22.137 ms - 295\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:17"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c16dd52647d149ee13f53 \u001b[32m200\u001b[0m 10.252 ms - 1489\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:18"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c16dd52647d149ee13f73/retry \u001b[32m200\u001b[0m 8.524 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:18"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c16dd52647d149ee13f73 \u001b[32m200\u001b[0m 6.142 ms - 966\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:23"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c16dd52647d149ee13f53 \u001b[32m200\u001b[0m 5.482 ms - 1489\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:23"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c16dd52647d149ee13f73/retry \u001b[32m200\u001b[0m 5.458 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:23"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c16dd52647d149ee13f73 \u001b[32m200\u001b[0m 6.569 ms - 443\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:39:28"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:39:59"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:40:29"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:52001/","service":"proofsy-backend","timestamp":"2026-05-31 16:40:30"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:40:30"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:40:30"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 91.256 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:27"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 23.203 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 8.749 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 4.687 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 7.549 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 345.737 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 20.999 ms - 295\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c179b6aaf6f61cabfe989 \u001b[32m200\u001b[0m 11.451 ms - 1501\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c179c6aaf6f61cabfe9a3/retry \u001b[32m200\u001b[0m 9.775 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:28"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c179c6aaf6f61cabfe9a3 \u001b[32m200\u001b[0m 6.483 ms - 966\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:33"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c179b6aaf6f61cabfe989 \u001b[32m200\u001b[0m 6.293 ms - 1501\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:33"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c179c6aaf6f61cabfe9a3/retry \u001b[32m200\u001b[0m 5.569 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:33"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c179c6aaf6f61cabfe9a3 \u001b[32m200\u001b[0m 9.329 ms - 443\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:42:38"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:43:00"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:43:30"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:50811/","service":"proofsy-backend","timestamp":"2026-05-31 16:43:31"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:43:31"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:43:31"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 90.409 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 24.029 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 9.127 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 4.706 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 8.432 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 336.942 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 22.957 ms - 295\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c17f7c5adea5c761c5b92 \u001b[32m200\u001b[0m 10.360 ms - 1491\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c17f7c5adea5c761c5bb8/retry \u001b[32m200\u001b[0m 9.755 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:43:59"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c17f7c5adea5c761c5bb8 \u001b[32m200\u001b[0m 8.054 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:04"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 79.875 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:34"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m200\u001b[0m 2.450 ms - 63\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:34"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 5.127 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:34"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 3.097 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:34"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 6.838 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:34"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 6.029 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:34"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 5.517 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:35"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 4.673 ms - 340\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:35"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c17f7c5adea5c761c5b92 \u001b[32m200\u001b[0m 6.475 ms - 1491\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:35"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c181ac5adea5c761c5bd0/retry \u001b[32m200\u001b[0m 5.137 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:35"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 6.460 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:36"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 5.350 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:37"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 4.649 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:38"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 4.646 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:39"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 4.529 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:40"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 4.533 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:41"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 3.979 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:42"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 4.520 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:43"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 5.549 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:44"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c181ac5adea5c761c5bd0 \u001b[32m200\u001b[0m 4.522 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:44:45"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:45:08"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:45:38"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:53129/","service":"proofsy-backend","timestamp":"2026-05-31 16:45:38"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:45:38"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:45:38"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 92.932 ms - 367\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:38"}
+{"level":"info","message":"\u001b[0mPOST /api/templates/seed \u001b[32m201\u001b[0m 23.197 ms - 56\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:38"}
+{"level":"info","message":"\u001b[0mGET /api/templates \u001b[32m200\u001b[0m 7.933 ms - 1767\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:38"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 4.278 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:38"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 7.625 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:38"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 340.985 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:38"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c1896106daf775a78f43f \u001b[32m200\u001b[0m 6.780 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:39"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m200\u001b[0m 4.737 ms - 340\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:39"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c1896106daf775a78f41f \u001b[32m200\u001b[0m 7.803 ms - 1504\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:39"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c1896106daf775a78f43f/retry \u001b[32m200\u001b[0m 7.149 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:40"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c1896106daf775a78f43f \u001b[32m200\u001b[0m 6.451 ms - 999\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:41"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c1896106daf775a78f43f \u001b[32m200\u001b[0m 5.811 ms - 999\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:41"}
+{"level":"info","message":"\u001b[0mPUT /api/templates/6a1c1896106daf775a78f41f \u001b[32m200\u001b[0m 8.030 ms - 1490\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:41"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/6a1c1896106daf775a78f43f/retry \u001b[32m200\u001b[0m 5.875 ms - 153\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:41"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c1896106daf775a78f43f \u001b[32m200\u001b[0m 4.796 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:42"}
+{"level":"info","message":"\u001b[0mGET /api/certificates/6a1c1896106daf775a78f43f \u001b[32m200\u001b[0m 4.820 ms - 488\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:46:42"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 67.504 ms - 362\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:55:20"}
+{"level":"info","message":"\u001b[0mPOST /api/workspaces \u001b[33m404\u001b[0m 0.233 ms - 43\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:55:20"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:55:32"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:56:02"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 16:56:10"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 16:56:12"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:57326/","service":"proofsy-backend","timestamp":"2026-05-31 16:56:12"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 16:56:12"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 16:56:12"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 103.500 ms - 403\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:21"}
+{"level":"info","message":"\u001b[0mPOST /api/workspaces \u001b[32m201\u001b[0m 7.729 ms - 380\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:21"}
+{"level":"info","message":"\u001b[0mPOST /api/workspaces \u001b[32m201\u001b[0m 5.217 ms - 380\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:21"}
+{"level":"info","message":"\u001b[0mPOST /api/workspaces/6a1c1addf1eff7022c336430/invite \u001b[32m201\u001b[0m 71.239 ms - 188\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:22"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/login \u001b[32m200\u001b[0m 62.886 ms - 414\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:22"}
+{"level":"info","message":"\u001b[0mGET /api/workspaces \u001b[32m200\u001b[0m 5.741 ms - 382\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:22"}
+{"level":"info","message":"\u001b[0mGET /api/events \u001b[33m403\u001b[0m 3.926 ms - 81\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:22"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 6.265 ms - 200\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:22"}
+{"level":"info","message":"\u001b[0mGET /api/events \u001b[32m200\u001b[0m 5.250 ms - 202\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:22"}
+{"level":"info","message":"\u001b[0mGET /api/events \u001b[32m200\u001b[0m 4.339 ms - 26\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 16:56:22"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 69.252 ms - 419\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:04:54"}
+{"level":"info","message":"\u001b[0mGET /api/workspaces \u001b[32m200\u001b[0m 4.079 ms - 395\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:04:54"}
+{"level":"info","message":"✓ All required environment variables are set","service":"proofsy-backend","timestamp":"2026-05-31 17:05:08"}
+{"level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 17:05:10"}
+{"level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:59782/","service":"proofsy-backend","timestamp":"2026-05-31 17:05:11"}
+{"level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 17:05:11"}
+{"level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 17:05:11"}
+{"level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 107.668 ms - 419\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:17"}
+{"level":"info","message":"\u001b[0mGET /api/workspaces \u001b[32m200\u001b[0m 8.158 ms - 444\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:17"}
+{"level":"info","message":"\u001b[0mPOST /api/events \u001b[32m201\u001b[0m 7.507 ms - 204\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:17"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[33m402\u001b[0m 58.591 ms - 163\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:17"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[32m202\u001b[0m 402.896 ms - 157\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mGET /api/workspaces \u001b[32m200\u001b[0m 8.068 ms - 442\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[33m402\u001b[0m 13.843 ms - 159\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mPUT /api/integrations/rest-api \u001b[32m200\u001b[0m 6.518 ms - 110\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[33m402\u001b[0m 9.117 ms - 105\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mPOST /api/billing/pay \u001b[32m200\u001b[0m 166.949 ms - 118\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mGET /api/billing/status/TXN-3718D122-1015-4AEC?mock=true \u001b[32m200\u001b[0m 9.154 ms - 73\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mGET /api/workspaces \u001b[32m200\u001b[0m 4.435 ms - 450\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[32m202\u001b[0m 12.522 ms - 155\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mGET /api/workspaces \u001b[32m200\u001b[0m 5.059 ms - 449\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mPOST /api/v1/certificates \u001b[32m201\u001b[0m 10.978 ms - 313\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mGET /api/workspaces \u001b[32m200\u001b[0m 4.330 ms - 449\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:05:18"}
+{"level":"info","message":"\u001b[0mGET / \u001b[33m404\u001b[0m 0.331 ms - 43\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:11:01"}
+{"level":"info","message":"\u001b[0mGET /favicon.ico \u001b[33m404\u001b[0m 0.286 ms - 43\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 17:11:01"}
+{"environment":"development","level":"info","message":"Using default for RATE_LIMIT_WINDOW_MS: 900000","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.637"}
+{"environment":"development","level":"info","message":"Using default for RATE_LIMIT_MAX: 1000","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.638"}
+{"environment":"development","level":"info","message":"✓ Environment validated: development","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.638"}
+{"environment":"development","level":"info","message":"✓ Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.639"}
+{"environment":"development","level":"info","message":"✓ Log level: info","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.639"}
+{"environment":"development","level":"info","message":"✓ Static /storage route mounted (local filesystem mode)","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.646"}
+{"environment":"development","level":"info","message":"[Templates] Synchronizing 6 starter templates from assets...","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.921"}
+{"environment":"development","level":"info","message":"[Templates] Starter templates are already synchronized.","service":"proofsy-backend","timestamp":"2026-05-31 21:24:58.923"}
+{"environment":"development","level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 21:25:00.948"}
+{"environment":"development","level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:53261/","service":"proofsy-backend","timestamp":"2026-05-31 21:25:01.763"}
+{"environment":"development","level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 21:25:01.770"}
+{"environment":"development","level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 21:25:01.770"}
+{"environment":"development","level":"info","message":"Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 21:25:01.770"}
+{"environment":"development","level":"info","message":"Rate limit: 1000 req/900s","service":"proofsy-backend","timestamp":"2026-05-31 21:25:01.770"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 3.625 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.670"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/ready \u001b[32m200\u001b[0m 0.917 ms - 59\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.684"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/live \u001b[32m200\u001b[0m 0.297 ms - 18\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.687"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.490 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.691"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.576 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.694"}
+{"environment":"development","level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[33m400\u001b[0m 1.357 ms - 53\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.719"}
+{"environment":"development","level":"info","message":"\u001b[0mPOST /api/auth/login \u001b[33m401\u001b[0m 15.988 ms - 47\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.738"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.408 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.742"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.633 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.746"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.463 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.749"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.505 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.759"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.469 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.761"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.339 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.762"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.628 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.764"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.370 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.765"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.337 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.767"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.338 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.769"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.294 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.770"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.248 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:18.771"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.393 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.591"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/ready \u001b[32m200\u001b[0m 0.478 ms - 59\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.603"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/live \u001b[32m200\u001b[0m 0.180 ms - 18\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.606"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.428 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.609"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.451 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.611"}
+{"environment":"development","level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 128.982 ms - 414\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.744"}
+{"environment":"development","level":"info","message":"\u001b[0mPOST /api/auth/login \u001b[32m200\u001b[0m 65.424 ms - 414\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.813"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.395 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.817"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.477 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.820"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.565 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.824"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.666 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.834"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.433 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.836"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.404 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.838"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.423 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.839"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.783 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.841"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.454 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.843"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.303 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.844"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.314 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.845"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.318 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:25:56.846"}
+{"environment":"development","level":"info","message":"Using default for RATE_LIMIT_WINDOW_MS: 900000","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.806"}
+{"environment":"development","level":"info","message":"Using default for RATE_LIMIT_MAX: 1000","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.807"}
+{"environment":"development","level":"info","message":"✓ Environment validated: development","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.808"}
+{"environment":"development","level":"info","message":"✓ Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.808"}
+{"environment":"development","level":"info","message":"✓ Log level: info","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.808"}
+{"environment":"development","level":"info","message":"✓ Static /storage route mounted (local filesystem mode)","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.814"}
+{"environment":"development","level":"info","message":"[Templates] Synchronizing 6 starter templates from assets...","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.993"}
+{"environment":"development","level":"info","message":"[Templates] Starter templates are already synchronized.","service":"proofsy-backend","timestamp":"2026-05-31 21:26:24.994"}
+{"environment":"development","level":"warn","message":"Local MongoDB not available, starting in-memory MongoDB for development...","service":"proofsy-backend","timestamp":"2026-05-31 21:26:27.016"}
+{"environment":"development","level":"info","message":"✓ Connected to in-memory MongoDB: mongodb://127.0.0.1:53323/","service":"proofsy-backend","timestamp":"2026-05-31 21:26:27.651"}
+{"environment":"development","level":"info","message":"✓ Proofsy backend running on http://localhost:5000","service":"proofsy-backend","timestamp":"2026-05-31 21:26:27.656"}
+{"environment":"development","level":"info","message":"Environment: development","service":"proofsy-backend","timestamp":"2026-05-31 21:26:27.656"}
+{"environment":"development","level":"info","message":"Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 21:26:27.656"}
+{"environment":"development","level":"info","message":"Rate limit: 1000 req/900s","service":"proofsy-backend","timestamp":"2026-05-31 21:26:27.657"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 2.794 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.501"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/ready \u001b[32m200\u001b[0m 1.272 ms - 59\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.515"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/live \u001b[32m200\u001b[0m 0.501 ms - 18\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.520"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.696 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.525"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.569 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.529"}
+{"environment":"development","level":"info","message":"\u001b[0mPOST /api/auth/register \u001b[32m201\u001b[0m 137.945 ms - 414\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.688"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/audit-logs \u001b[32m200\u001b[0m 56.731 ms - 73\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.749"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/certificates/stats \u001b[32m200\u001b[0m 29.779 ms - 408\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.783"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.632 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.787"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.452 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.790"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.551 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.794"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.684 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.805"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.554 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.807"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.736 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.810"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.412 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.811"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.382 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.812"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.406 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.814"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.412 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.816"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.421 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.818"}
+{"environment":"development","level":"info","message":"\u001b[0mGET /api/health \u001b[32m200\u001b[0m 0.268 ms - 358\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 21:26:42.819"}
+{"environment":"test","level":"info","message":"Using default for STORAGE_PROVIDER: local","service":"proofsy-backend","timestamp":"2026-05-31 23:13:56.150"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_WINDOW_MS: 900000","service":"proofsy-backend","timestamp":"2026-05-31 23:13:56.154"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_MAX: 1000","service":"proofsy-backend","timestamp":"2026-05-31 23:13:56.156"}
+{"environment":"test","level":"info","message":"✓ Environment validated: test","service":"proofsy-backend","timestamp":"2026-05-31 23:13:56.157"}
+{"environment":"test","level":"info","message":"✓ Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 23:13:56.159"}
+{"environment":"test","level":"info","message":"✓ Log level: info","service":"proofsy-backend","timestamp":"2026-05-31 23:13:56.161"}
+{"environment":"test","level":"info","message":"✓ Static /storage route mounted (local filesystem mode)","service":"proofsy-backend","timestamp":"2026-05-31 23:13:56.184"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[32m201\u001b[0m 40.178 ms - 102\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:13:58.571"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[33m409\u001b[0m 6.587 ms - 47\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:13:58.594"}
+{"environment":"test","level":"info","message":"\u001b[0mGET /api/verify/INVALID-CODE-123 \u001b[33m404\u001b[0m 4.145 ms - 79\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:13:58.725"}
+{"environment":"test","level":"info","message":"Using default for STORAGE_PROVIDER: local","service":"proofsy-backend","timestamp":"2026-05-31 23:14:16.542"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_WINDOW_MS: 900000","service":"proofsy-backend","timestamp":"2026-05-31 23:14:16.545"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_MAX: 1000","service":"proofsy-backend","timestamp":"2026-05-31 23:14:16.547"}
+{"environment":"test","level":"info","message":"✓ Environment validated: test","service":"proofsy-backend","timestamp":"2026-05-31 23:14:16.548"}
+{"environment":"test","level":"info","message":"✓ Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 23:14:16.550"}
+{"environment":"test","level":"info","message":"✓ Log level: info","service":"proofsy-backend","timestamp":"2026-05-31 23:14:16.551"}
+{"environment":"test","level":"info","message":"✓ Static /storage route mounted (local filesystem mode)","service":"proofsy-backend","timestamp":"2026-05-31 23:14:16.575"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[32m201\u001b[0m 29.292 ms - 102\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:17.801"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[33m409\u001b[0m 9.027 ms - 47\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:17.826"}
+{"environment":"test","level":"info","message":"\u001b[0mGET /api/verify/INVALID-CODE-123 \u001b[33m404\u001b[0m 4.810 ms - 79\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:17.939"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[33m400\u001b[0m 37.751 ms - 83\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:18.177"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[32m202\u001b[0m 79.484 ms - 132\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:18.359"}
+{"environment":"test","level":"info","message":"Using default for STORAGE_PROVIDER: local","service":"proofsy-backend","timestamp":"2026-05-31 23:14:34.433"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_WINDOW_MS: 900000","service":"proofsy-backend","timestamp":"2026-05-31 23:14:34.437"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_MAX: 1000","service":"proofsy-backend","timestamp":"2026-05-31 23:14:34.438"}
+{"environment":"test","level":"info","message":"✓ Environment validated: test","service":"proofsy-backend","timestamp":"2026-05-31 23:14:34.440"}
+{"environment":"test","level":"info","message":"✓ Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 23:14:34.442"}
+{"environment":"test","level":"info","message":"✓ Log level: info","service":"proofsy-backend","timestamp":"2026-05-31 23:14:34.443"}
+{"environment":"test","level":"info","message":"✓ Static /storage route mounted (local filesystem mode)","service":"proofsy-backend","timestamp":"2026-05-31 23:14:34.466"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[32m201\u001b[0m 28.597 ms - 102\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:35.635"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[33m409\u001b[0m 8.768 ms - 47\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:35.659"}
+{"environment":"test","level":"info","message":"\u001b[0mGET /api/verify/INVALID-CODE-123 \u001b[33m404\u001b[0m 4.795 ms - 79\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:35.767"}
+{"environment":"test","level":"info","message":"\u001b[0mGET /api/verify/VALID-123 \u001b[32m200\u001b[0m 32.959 ms - 329\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:35.910"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[33m400\u001b[0m 33.303 ms - 83\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:36.067"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[32m202\u001b[0m 64.955 ms - 132\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:36.238"}

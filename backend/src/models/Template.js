@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const TextLayerSchema = new mongoose.Schema(
   {
+    _id: {
+      type: String,
+      default: () => new mongoose.Types.ObjectId().toString(),
+    },
     variable: {
       type: String,
       required: true,
@@ -99,6 +103,12 @@ const TemplateSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Organization",
       required: false, // null for starter templates
+    },
+    workspaceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Workspace",
+      required: false, // null for starter templates
+      index: true,
     },
     // Fixed QR code position
     qrCode: {

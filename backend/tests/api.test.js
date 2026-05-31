@@ -53,12 +53,42 @@ beforeEach(async () => {
 });
 
 describe("Proofsy API Tests", () => {
+  let org;
+  let member;
+  let workspace;
+  let token;
+  const jwt = require("jsonwebtoken");
+
+  beforeEach(async () => {
+    // Need a JWT secret for tests
+    process.env.JWT_SECRET = "test-secret";
+    const Organization = require("../src/models/Organization");
+    const TeamMember = require("../src/models/TeamMember");
+    const Workspace = require("../src/models/Workspace");
+
+    org = await Organization.create({ name: "Test Org" });
+    member = await TeamMember.create({
+      organizationId: org._id,
+      name: "Admin",
+      email: "admin@test.com",
+      password: "password",
+      role: "owner"
+    });
+    workspace = await Workspace.create({
+      name: "Default Workspace",
+      organizationId: org._id,
+      slug: "default",
+      createdBy: member._id
+    });
+    token = jwt.sign({ id: member._id }, process.env.JWT_SECRET);
+  });
 
   describe("POST /api/users", () => {
     it("should handle duplicate user creation gracefully (upsert logic)", async () => {
       // First creation
       const res1 = await request(app)
         .post("/api/users")
+        .set("Authorization", `Bearer ${token}`)
         .send({ name: "John Doe", email: "john@example.com" });
       
       expect(res1.status).toBe(201);
@@ -68,9 +98,10 @@ describe("Proofsy API Tests", () => {
       // Second creation with same email
       const res2 = await request(app)
         .post("/api/users")
+        .set("Authorization", `Bearer ${token}`)
         .send({ name: "John Doe", email: "john@example.com" });
       
-      expect(res2.status).toBe(409); // /api/users rejects duplicates
+      expect(res2.status).toBe(409);
       expect(res2.body.success).toBe(false);
       expect(res2.body.error).toContain("already exists");
 
@@ -89,12 +120,13 @@ describe("Proofsy API Tests", () => {
     });
 
     it("should verify a valid certificate", async () => {
-      // Setup mock data
-      const event = await Event.create({ name: "Test Event", date: new Date(), organizerName: "Acme" });
+      const event = await Event.create({ name: "Test Event", date: new Date(), organizerName: "Acme", organizationId: org._id, workspaceId: workspace._id });
       const user = await User.create({ name: "Jane Doe", email: "jane@example.com" });
       const cert = await Certificate.create({
         userId: user._id,
         eventId: event._id,
+        organizationId: org._id,
+        workspaceId: workspace._id,
         verificationCode: "VALID-123",
         status: "generated"
       });
@@ -109,14 +141,14 @@ describe("Proofsy API Tests", () => {
 
   describe("POST /api/certificates/generate (Bulk Upload)", () => {
     it("should reject an empty CSV upload", async () => {
-      const event = await Event.create({ name: "Test Event", date: new Date(), organizerName: "Acme" });
+      const event = await Event.create({ name: "Test Event", date: new Date(), organizerName: "Acme", organizationId: org._id, workspaceId: workspace._id });
       
-      // Create empty CSV
       const csvPath = path.join(__dirname, "empty.csv");
-      fs.writeFileSync(csvPath, "name,email\n"); // Just headers
+      fs.writeFileSync(csvPath, "name,email\n");
 
       const res = await request(app)
         .post("/api/certificates/generate")
+        .set("Authorization", `Bearer ${token}`)
         .field("eventId", event._id.toString())
         .attach("file", csvPath);
 
@@ -124,19 +156,18 @@ describe("Proofsy API Tests", () => {
       expect(res.body.success).toBe(false);
       expect(res.body.error).toContain("CSV is empty");
 
-      // Cleanup
       fs.unlinkSync(csvPath);
     });
 
     it("should process a valid CSV and generate certificates", async () => {
-      const event = await Event.create({ name: "Test Event", date: new Date(), organizerName: "Acme" });
+      const event = await Event.create({ name: "Test Event", date: new Date(), organizerName: "Acme", organizationId: org._id, workspaceId: workspace._id });
       
-      // Create valid CSV
       const csvPath = path.join(__dirname, "valid.csv");
       fs.writeFileSync(csvPath, "name,email\nAlice,alice@example.com\nBob,bob@example.com");
 
       const res = await request(app)
         .post("/api/certificates/generate")
+        .set("Authorization", `Bearer ${token}`)
         .field("eventId", event._id.toString())
         .attach("file", csvPath);
 
@@ -144,11 +175,9 @@ describe("Proofsy API Tests", () => {
       expect(res.body.success).toBe(true);
       expect(res.body.data.totalRowsProcessed).toBe(2);
 
-      // Verify DB state
       const certs = await Certificate.find({ eventId: event._id });
       expect(certs.length).toBe(2);
 
-      // Cleanup
       fs.unlinkSync(csvPath);
     });
   });

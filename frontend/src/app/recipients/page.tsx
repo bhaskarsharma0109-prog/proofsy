@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import { api, CertificateData, UserLookupData } from "@/lib/api";
-import { pageVariants, staggerContainer, fadeUp, headerSlide, tableRow, pulseGlow } from "@/lib/animations";
+import { pageVariants, headerSlide, pulseGlow, tableRow } from "@/lib/animations";
 
 interface RecipientRow {
   id: string;

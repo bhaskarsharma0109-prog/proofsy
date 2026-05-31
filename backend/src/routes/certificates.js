@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const certificateController = require("../controllers/certificateController");
 const { protect } = require("../middleware/auth");
+const { tenantProtect } = require("../middleware/tenantProtect");
 
 // Configure multer for CSV uploads.
 // We require BOTH a CSV extension and an acceptable CSV-ish MIME type to reduce
@@ -30,10 +31,12 @@ const upload = multer({
 });
 
 // All certificate routes require authentication and are organization-scoped.
-router.post("/generate", protect, upload.single("file"), certificateController.generateCertificates);
-router.post("/send-emails", protect, certificateController.sendEmails);
-router.get("/stats", protect, certificateController.getStats);
-router.get("/", protect, certificateController.listCertificates);
-router.get("/:id", protect, certificateController.getCertificateById);
+router.post("/generate", protect, tenantProtect, upload.single("file"), certificateController.generateCertificates);
+router.post("/send-emails", protect, tenantProtect, certificateController.sendEmails);
+router.get("/stats", protect, tenantProtect, certificateController.getStats);
+router.get("/verification-analytics", protect, tenantProtect, certificateController.getVerificationAnalytics);
+router.get("/", protect, tenantProtect, certificateController.listCertificates);
+router.get("/:id", protect, tenantProtect, certificateController.getCertificateById);
+router.post("/:id/retry", protect, tenantProtect, certificateController.retryCertificate);
 
 module.exports = router;

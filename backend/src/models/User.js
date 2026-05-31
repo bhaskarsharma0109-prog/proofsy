@@ -14,6 +14,40 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    loginCode: {
+      type: String,
+      select: false,
+    },
+    loginCodeExpires: {
+      type: Date,
+      select: false,
+    },
+    bio: {
+      type: String,
+      maxlength: 500,
+      default: "",
+    },
+    profilePhoto: {
+      type: String,
+      default: "",
+    },
+    linkedinUrl: {
+      type: String,
+      default: "",
+    },
+    twitterHandle: {
+      type: String,
+      default: "",
+    },
+    portfolioTitle: {
+      type: String,
+      maxlength: 100,
+      default: "",
+    },
+    isPublicProfile: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

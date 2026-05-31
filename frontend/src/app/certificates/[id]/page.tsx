@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { api, CertificateDetailData, BACKEND_URL } from "@/lib/api";
@@ -158,76 +159,88 @@ export default function CertificatePreview() {
       <div className="flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-4xl">
           {/* Shadow wrapper for depth */}
-          <motion.div variants={scaleUp} initial="hidden" animate="visible" className="bg-[var(--color-surface)] shadow-2xl rounded-sm overflow-hidden">
-            {/* The certificate itself */}
-            <div className="aspect-[1.414] relative flex flex-col items-center justify-center p-16" style={{
-              border: '6px solid var(--color-primary)',
-            }}>
-              {/* Corner decorations */}
-              <div className="absolute top-0 left-0 w-28 h-28 bg-[var(--color-primary)] opacity-[0.06] rounded-br-full" />
-              <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--color-primary)] opacity-[0.05] rounded-bl-full" />
-              <div className="absolute bottom-0 right-0 w-36 h-36 bg-[var(--color-primary)] opacity-[0.06] rounded-tl-full" />
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-[var(--color-primary)] opacity-[0.05] rounded-tr-full" />
+          <motion.div variants={scaleUp} initial="hidden" animate="visible" className="bg-[var(--color-surface)] shadow-2xl rounded-sm overflow-hidden border border-[var(--color-border)]">
+            {certificate.pngUrl ? (
+              <div className="relative w-full aspect-[1.414]">
+                <Image
+                  src={`${BACKEND_URL}${certificate.pngUrl}`}
+                  alt="Proofsy Verified Certificate"
+                  fill
+                  priority
+                  className="object-contain"
+                />
+              </div>
+            ) : (
+              /* Fallback HTML certificate mockup if PNG generation is still pending */
+              <div className="aspect-[1.414] relative flex flex-col items-center justify-center p-16" style={{
+                border: '6px solid var(--color-primary)',
+              }}>
+                {/* Corner decorations */}
+                <div className="absolute top-0 left-0 w-28 h-28 bg-[var(--color-primary)] opacity-[0.06] rounded-br-full" />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--color-primary)] opacity-[0.05] rounded-bl-full" />
+                <div className="absolute bottom-0 right-0 w-36 h-36 bg-[var(--color-primary)] opacity-[0.06] rounded-tl-full" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-[var(--color-primary)] opacity-[0.05] rounded-tr-full" />
 
-              {/* Inner border */}
-              <div className="absolute inset-4 border border-[var(--color-border)] rounded-sm pointer-events-none" />
+                {/* Inner border */}
+                <div className="absolute inset-4 border border-[var(--color-border)] rounded-sm pointer-events-none" />
 
-              <div className="z-10 text-center w-full max-w-2xl space-y-6">
-                {/* Brand */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <div className="w-6 h-6 rounded bg-[var(--color-primary)] flex items-center justify-center">
-                      <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                      </svg>
+                <div className="z-10 text-center w-full max-w-2xl space-y-6">
+                  {/* Brand */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <div className="w-6 h-6 rounded bg-[var(--color-primary)] flex items-center justify-center">
+                        <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-[var(--color-primary)] tracking-[0.25em] uppercase">Proofsy</h3>
+                    <p className="text-[11px] text-[var(--color-muted)] uppercase tracking-[0.2em]">Certificate of Completion</p>
+                  </div>
+
+                  {/* Certify */}
+                  <div className="pt-4">
+                    <p className="text-sm text-[var(--color-muted)]">This is to certify that</p>
+                    <div className="w-full max-w-xl mx-auto mt-3 border-b-2 border-[var(--color-border)] pb-2 overflow-hidden">
+                      <h1
+                        ref={nameRef}
+                        className="font-bold text-[var(--color-foreground)] whitespace-nowrap leading-none tracking-tight"
+                        style={{ fontSize: "3.5rem" }}
+                      >
+                        {certificate.recipientName}
+                      </h1>
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--color-primary)] tracking-[0.25em] uppercase">Proofsy</h3>
-                  <p className="text-[11px] text-[var(--color-muted)] uppercase tracking-[0.2em]">Certificate of Completion</p>
-                </div>
 
-                {/* Certify */}
-                <div className="pt-4">
-                  <p className="text-sm text-[var(--color-muted)]">This is to certify that</p>
-                  <div className="w-full max-w-xl mx-auto mt-3 border-b-2 border-[var(--color-border)] pb-2 overflow-hidden">
-                    <h1
-                      ref={nameRef}
-                      className="font-bold text-[var(--color-foreground)] whitespace-nowrap leading-none tracking-tight"
-                      style={{ fontSize: "3.5rem" }}
-                    >
-                      {certificate.recipientName}
-                    </h1>
-                  </div>
-                </div>
-
-                {/* Event */}
-                <div className="space-y-2">
-                  <p className="text-sm text-[var(--color-muted)]">has successfully completed the</p>
-                  <h2 className="text-2xl font-semibold text-[var(--color-primary)]">{certificate.eventName}</h2>
-                </div>
-
-                {/* Footer row */}
-                <div className="pt-12 flex justify-between items-end w-full px-8">
-                  <div className="text-center">
-                    <p className="border-t border-[var(--color-muted)] pt-2 font-medium text-sm text-[var(--color-foreground)]">{formatDate(certificate.eventDate)}</p>
-                    <p className="text-[10px] text-[var(--color-muted)] mt-1 uppercase tracking-wider">Date</p>
+                  {/* Event */}
+                  <div className="space-y-2">
+                    <p className="text-sm text-[var(--color-muted)]">has successfully completed the</p>
+                    <h2 className="text-2xl font-semibold text-[var(--color-primary)]">{certificate.eventName}</h2>
                   </div>
 
-                  <div className="text-center">
-                    <div className="w-20 h-20 border-2 border-[var(--color-primary)] mx-auto mb-2 flex flex-col items-center justify-center bg-[var(--color-primary-faint)] rounded-sm px-2">
-                      <span className="font-mono text-[9px] text-[var(--color-primary)]">QR READY</span>
-                      <span className="text-[8px] text-[var(--color-muted)] mt-1 text-center leading-tight">PDF scan opens verify page</span>
+                  {/* Footer row */}
+                  <div className="pt-12 flex justify-between items-end w-full px-8">
+                    <div className="text-center">
+                      <p className="border-t border-[var(--color-muted)] pt-2 font-medium text-sm text-[var(--color-foreground)]">{formatDate(certificate.eventDate)}</p>
+                      <p className="text-[10px] text-[var(--color-muted)] mt-1 uppercase tracking-wider">Date</p>
                     </div>
-                    <p className="font-mono text-[10px] text-[var(--color-primary)] font-semibold">{certificate.verificationCode}</p>
-                  </div>
 
-                  <div className="text-center">
-                    <p className="border-t border-[var(--color-muted)] pt-2 font-medium text-sm text-[var(--color-foreground)]">{certificate.organizerName}</p>
-                    <p className="text-[10px] text-[var(--color-muted)] mt-1 uppercase tracking-wider">Organizer</p>
+                    <div className="text-center">
+                      <div className="w-20 h-20 border-2 border-[var(--color-primary)] mx-auto mb-2 flex flex-col items-center justify-center bg-[var(--color-primary-faint)] rounded-sm px-2">
+                        <span className="font-mono text-[9px] text-[var(--color-primary)]">QR READY</span>
+                        <span className="text-[8px] text-[var(--color-muted)] mt-1 text-center leading-tight">PDF scan opens verify page</span>
+                      </div>
+                      <p className="font-mono text-[10px] text-[var(--color-primary)] font-semibold">{certificate.verificationCode}</p>
+                    </div>
+
+                    <div className="text-center">
+                      <p className="border-t border-[var(--color-muted)] pt-2 font-medium text-sm text-[var(--color-foreground)]">{certificate.organizerName}</p>
+                      <p className="text-[10px] text-[var(--color-muted)] mt-1 uppercase tracking-wider">Organizer</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
           </motion.div>
         </div>
       </div>

@@ -20,12 +20,13 @@ const upload = multer({
 });
 
 const { protect } = require("../middleware/auth");
+const { tenantProtect } = require("../middleware/tenantProtect");
 
-router.post("/", protect, upload.single("background"), templateController.createTemplate);
-router.get("/", protect, templateController.listTemplates);
+router.post("/", protect, tenantProtect, upload.single("background"), templateController.createTemplate);
+router.get("/", protect, tenantProtect, templateController.listTemplates);
 router.post("/seed", templateController.seedStarterTemplates);
-router.get("/:id", protect, templateController.getTemplate);
-router.put("/:id", protect, upload.single("background"), templateController.updateTemplate);
-router.delete("/:id", protect, templateController.deleteTemplate);
+router.get("/:id", protect, tenantProtect, templateController.getTemplate);
+router.put("/:id", protect, tenantProtect, upload.single("background"), templateController.updateTemplate);
+router.delete("/:id", protect, tenantProtect, templateController.deleteTemplate);
 
 module.exports = router;

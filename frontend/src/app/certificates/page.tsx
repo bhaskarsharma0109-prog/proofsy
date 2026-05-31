@@ -6,7 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api, CertificateData } from "@/lib/api";
-import { pageVariants, fadeUp, headerSlide, tableRow, pulseGlow } from "@/lib/animations";
+import { pageVariants, headerSlide, tableRow, pulseGlow } from "@/lib/animations";
 
 export default function CertificatesListPage() {
   const router = useRouter();

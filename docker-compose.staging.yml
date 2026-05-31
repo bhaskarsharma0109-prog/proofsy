@@ -1,0 +1,62 @@
+# ══════════════════════════════════════════════════════════════
+# Proofsy — Staging Docker Compose Override
+# ══════════════════════════════════════════════════════════════
+# Usage: docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d
+#
+# This override file adjusts the base docker-compose.yml for staging
+# deployments with staging-specific environment variables, resource
+# constraints, and reduced replicas.
+# ══════════════════════════════════════════════════════════════
+
+version: "3.9"
+
+services:
+  backend:
+    env_file: ./backend/.env.staging
+    environment:
+      - NODE_ENV=staging
+      - NODE_OPTIONS=--max-old-space-size=512
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  worker:
+    env_file: ./backend/.env.staging
+    environment:
+      - NODE_ENV=staging
+      - NODE_OPTIONS=--max-old-space-size=512
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  frontend:
+    environment:
+      - NODE_ENV=staging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+        reservations:
+          cpus: "0.1"
+          memory: 128M

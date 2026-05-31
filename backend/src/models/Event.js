@@ -21,6 +21,12 @@ const EventSchema = new mongoose.Schema(
       ref: "Organization",
       required: true,
     },
+    workspaceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Workspace",
+      required: true,
+      index: true,
+    },
     duration: {
       type: String,
       trim: true,

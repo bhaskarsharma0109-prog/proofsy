@@ -9,6 +9,7 @@ COPY . .
 
 # Next.js bakes NEXT_PUBLIC_* vars at build time
 ENV NEXT_PUBLIC_API_URL=/api
+ENV BACKEND_URL=http://backend:5000
 
 # Build the Next.js app in standalone mode
 RUN npm run build

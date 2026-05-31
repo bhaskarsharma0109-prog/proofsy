@@ -21,7 +21,7 @@ export default function AddRecipientsPage() {
 
   const [event, setEvent] = useState<EventDetailData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<"manual" | "csv">("csv");
+  const [tab, setTab] = useState<"manual" | "csv" | "googleSheets">("csv");
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -31,12 +31,34 @@ export default function AddRecipientsPage() {
   const [result, setResult] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Google Sheets state
+  const [googleSheetsConnected, setGoogleSheetsConnected] = useState(false);
+  const [googleSheetsUrl, setGoogleSheetsUrl] = useState("");
+  const [fetchingSheet, setFetchingSheet] = useState(false);
+  const [sheetRecipients, setSheetRecipients] = useState<Array<{ name: string; email: string }>>([]);
+
   useEffect(() => {
     async function load() {
       if (!eventId) return;
-      const res = await api.getEvent(eventId);
-      if (res.success && res.data) setEvent(res.data);
-      setLoading(false);
+      try {
+        const [eventRes, integrationsRes] = await Promise.all([
+          api.getEvent(eventId),
+          api.getIntegrations()
+        ]);
+        
+        if (eventRes.success && eventRes.data) {
+          setEvent(eventRes.data);
+        }
+        if (integrationsRes.success && integrationsRes.data) {
+          const data = integrationsRes.data as Record<string, { connected?: boolean; sheetUrl?: string }>;
+          setGoogleSheetsConnected(!!data.googleSheets?.connected);
+          setGoogleSheetsUrl(data.googleSheets?.sheetUrl || "");
+        }
+      } catch (err) {
+        console.error("Failed to load page data", err);
+      } finally {
+        setLoading(false);
+      }
     }
     load();
   }, [eventId]);
@@ -58,9 +80,51 @@ export default function AddRecipientsPage() {
     if (e.dataTransfer.files?.[0]?.name.endsWith(".csv")) setFile(e.dataTransfer.files[0]);
   };
 
+  const fetchSheetPreview = async () => {
+    if (!eventId) return;
+    setFetchingSheet(true);
+    setResult(null);
+    try {
+      const res = await api.getGoogleSheetsPreview(eventId);
+      if (res.success && res.data?.recipients) {
+        setSheetRecipients(res.data.recipients);
+      } else {
+        setResult({ type: "error", message: res.error || "Failed to load Google Sheet preview" });
+      }
+    } catch (err) {
+      console.error("Failed to preview Google Sheet", err);
+      setResult({ type: "error", message: "Failed to preview Google Sheet" });
+    } finally {
+      setFetchingSheet(false);
+    }
+  };
+
   const handleSubmit = async () => {
+    if (!eventId) return;
     setSubmitting(true);
     setResult(null);
+
+    // If Google Sheets, trigger custom endpoint
+    if (tab === "googleSheets") {
+      try {
+        const res = await api.importGoogleSheets(eventId);
+        if (res.success) {
+          setResult({ type: "success", message: res.message || "Recipients synced from Google Sheets and certificates queued!" });
+          setSheetRecipients([]);
+          // Reload event data
+          const updated = await api.getEvent(eventId);
+          if (updated.success && updated.data) setEvent(updated.data);
+        } else {
+          setResult({ type: "error", message: res.error || "Failed to sync recipients from Google Sheets" });
+        }
+      } catch (err) {
+        console.error("Google Sheets import error", err);
+        setResult({ type: "error", message: "An unexpected error occurred during sync." });
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
 
     let csvFile = file;
 
@@ -77,13 +141,13 @@ export default function AddRecipientsPage() {
       return;
     }
 
-    const res = await api.generateCertificates(eventId!, csvFile);
+    const res = await api.generateCertificates(eventId, csvFile);
     if (res.success) {
       setResult({ type: "success", message: res.data?.message || "Recipients added and certificates queued!" });
       setFile(null);
       setRecipients([]);
       // Reload event data
-      const updated = await api.getEvent(eventId!);
+      const updated = await api.getEvent(eventId);
       if (updated.success && updated.data) setEvent(updated.data);
     } else {
       setResult({ type: "error", message: res.error || "Failed to add recipients" });
@@ -160,6 +224,9 @@ export default function AddRecipientsPage() {
             </motion.button>
             <motion.button onClick={() => setTab("manual")} whileHover={cardHover} whileTap={cardTap} className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer ${tab === "manual" ? "bg-[var(--color-surface)] shadow-sm text-[var(--color-foreground)]" : "text-[var(--color-muted)]"}`}>
               Add Manually
+            </motion.button>
+            <motion.button onClick={() => setTab("googleSheets")} whileHover={cardHover} whileTap={cardTap} className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer ${tab === "googleSheets" ? "bg-[var(--color-surface)] shadow-sm text-[var(--color-foreground)]" : "text-[var(--color-muted)]"}`}>
+              Google Sheets
             </motion.button>
           </div>
 
@@ -238,6 +305,93 @@ export default function AddRecipientsPage() {
             </div>
           )}
 
+          {/* Google Sheets Import */}
+          {tab === "googleSheets" && (
+            <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] p-6 space-y-6">
+              {!googleSheetsConnected ? (
+                <div className="text-center py-10 flex flex-col items-center max-w-md mx-auto space-y-4">
+                  <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-3xl">📊</div>
+                  <h3 className="text-base font-bold text-[var(--color-foreground)]">Google Sheets not connected</h3>
+                  <p className="text-sm text-[var(--color-muted)]">
+                    You need to link your Google Sheet under the Integrations dashboard before you can pull recipient data directly.
+                  </p>
+                  <Link href="/integrations" className="inline-flex bg-[var(--color-primary)] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--color-primary-dark)] cursor-pointer shadow-sm">
+                    Connect Google Sheets
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Connected Sheet Summary */}
+                  <div className="flex items-center justify-between p-4 bg-[var(--color-surface-alt)] rounded-xl border border-[var(--color-border)]">
+                    <div className="flex items-center gap-3 overflow-hidden pr-4">
+                      <span className="text-2xl shrink-0">📊</span>
+                      <div className="overflow-hidden">
+                        <p className="text-xs font-semibold text-[var(--color-muted)]">CONNECTED SHEET</p>
+                        <a 
+                          href={googleSheetsUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-sm font-semibold text-[var(--color-primary)] hover:underline truncate block"
+                        >
+                          {googleSheetsUrl}
+                        </a>
+                      </div>
+                    </div>
+                    <button
+                      onClick={fetchSheetPreview}
+                      disabled={fetchingSheet}
+                      className="px-4 py-2 border border-[var(--color-border)] hover:bg-white bg-[var(--color-surface)] rounded-xl text-sm font-semibold text-[var(--color-foreground)] cursor-pointer disabled:opacity-50 flex items-center gap-2 shrink-0 shadow-sm"
+                    >
+                      {fetchingSheet ? (
+                        <>
+                          <svg className="w-4 h-4 animate-spin text-[var(--color-foreground)]" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                          Fetching...
+                        </>
+                      ) : (
+                        "Fetch Recipients"
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Fetched Recipients Table */}
+                  {sheetRecipients.length > 0 ? (
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-sm font-bold text-[var(--color-foreground)]">Recipients found in Google Sheet</h4>
+                        <span className="text-xs font-semibold text-[var(--color-success)] bg-[var(--color-success-bg)] px-2.5 py-0.5 rounded-full">
+                          {sheetRecipients.length} Recipient{sheetRecipients.length !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      <div className="border border-[var(--color-border)] rounded-xl overflow-hidden max-h-[300px] overflow-y-auto">
+                        <table className="w-full text-left">
+                          <thead className="sticky top-0 bg-[var(--color-surface-alt)] z-[1] border-b border-[var(--color-border)]">
+                            <tr>
+                              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Name</th>
+                              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-[var(--color-muted)]">Email</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[var(--color-border)] bg-white">
+                            {sheetRecipients.map((r, i) => (
+                              <tr key={i} className="hover:bg-[var(--color-surface-alt)]">
+                                <td className="px-4 py-3 text-sm font-medium">{r.name}</td>
+                                <td className="px-4 py-3 text-sm text-[var(--color-muted)]">{r.email}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-10 border border-dashed border-[var(--color-border)] rounded-xl">
+                      <p className="text-sm text-[var(--color-muted)]">No recipients loaded yet.</p>
+                      <p className="text-xs text-[var(--color-muted)] mt-1">Click &quot;Fetch Recipients&quot; to load your Google Sheet rows.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Actions */}
           <div className="flex items-center justify-between">
             <Link href={`/events/${eventId}`} className="px-5 py-2.5 border border-[var(--color-border)] rounded-xl text-sm font-medium hover:bg-[var(--color-surface-alt)]">
@@ -245,19 +399,19 @@ export default function AddRecipientsPage() {
             </Link>
             <motion.button
               onClick={handleSubmit}
-              disabled={submitting || (tab === "csv" ? !file : recipients.length === 0)}
+              disabled={submitting || (tab === "csv" ? !file : tab === "manual" ? recipients.length === 0 : sheetRecipients.length === 0)}
               whileTap={cardTap}
               className="bg-[var(--color-primary)] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:bg-[var(--color-primary-dark)] cursor-pointer shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
                 <>
                   <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                  Adding...
+                  Syncing...
                 </>
               ) : (
                 <>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" /></svg>
-                  Add Recipients & Generate Certificates
+                  {tab === "googleSheets" ? "Sync & Generate Certificates" : "Add Recipients & Generate Certificates"}
                 </>
               )}
             </motion.button>

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import RecipientAuthLayout from "@/components/RecipientAuthLayout";
 import { api } from "@/lib/api";
-import { saveRecipientEmail } from "@/lib/recipient-auth";
+import { saveRecipientEmail, saveRecipientToken } from "@/lib/recipient-auth";
 import { cardTap } from "@/lib/animations";
 
 export default function RecipientSignupPage() {
@@ -22,7 +22,7 @@ export default function RecipientSignupPage() {
     setError(null);
 
     const normalizedEmail = email.trim().toLowerCase();
-    const res = await api.createUser({
+    const res = await api.recipientRegister({
       name: name.trim(),
       email: normalizedEmail,
     });
@@ -34,6 +34,9 @@ export default function RecipientSignupPage() {
     }
 
     saveRecipientEmail(normalizedEmail);
+    if (res.token) {
+      saveRecipientToken(res.token);
+    }
     setSubmitting(false);
     router.push("/recipient/dashboard");
   };

@@ -25,7 +25,20 @@ function escapeHtml(value = "") {
   }[ch]));
 }
 
-async function getTransporter() {
+async function getTransporter(smtpSettings = null) {
+  if (smtpSettings && smtpSettings.host && smtpSettings.authUser) {
+    console.log(`[Email] Using Dynamic Workspace SMTP transport: ${smtpSettings.host} (${smtpSettings.fromEmail})`);
+    return nodemailer.createTransport({
+      host: smtpSettings.host,
+      port: parseInt(smtpSettings.port || "587", 10),
+      secure: smtpSettings.secure === true,
+      auth: {
+        user: smtpSettings.authUser,
+        pass: smtpSettings.authPass,
+      },
+    });
+  }
+
   if (transporter) return transporter;
 
   // Mode 1: SendGrid
@@ -76,9 +89,15 @@ async function getTransporter() {
 /**
  * Send a certificate delivery email to a recipient.
  */
-async function sendCertificateEmail({ recipientName, recipientEmail, eventName, eventDate, verificationCode, pdfUrl, verifyUrl }) {
-  const transport = await getTransporter();
-  const fromAddress = process.env.EMAIL_FROM || "noreply@proofsy.io";
+async function sendCertificateEmail({ recipientName, recipientEmail, eventName, eventDate, verificationCode, pdfUrl, verifyUrl, smtpSettings = null }) {
+  const transport = await getTransporter(smtpSettings);
+  let fromAddress = process.env.EMAIL_FROM || "noreply@proofsy.io";
+  let fromName = "Proofsy";
+
+  if (smtpSettings && smtpSettings.fromEmail) {
+    fromAddress = smtpSettings.fromEmail;
+    fromName = smtpSettings.fromName || "Proofsy";
+  }
 
   const dateStr = eventDate
     ? new Date(eventDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
@@ -156,7 +175,7 @@ async function sendCertificateEmail({ recipientName, recipientEmail, eventName, 
 </html>`;
 
   const info = await transport.sendMail({
-    from: `"Proofsy" <${fromAddress}>`,
+    from: `"${fromName}" <${fromAddress}>`,
     to: recipientEmail,
     subject: `Your credential for ${eventName} is ready`,
     text: `Hi ${recipientName},\n\nYour credential for ${eventName} (${dateStr}) is ready.\nCode: ${verificationCode}\n\nDownload: ${pdfUrl || "pending"}\nVerify: ${verifyUrl}\n\n— Proofsy`,
@@ -173,15 +192,74 @@ async function sendCertificateEmail({ recipientName, recipientEmail, eventName, 
 }
 
 /**
+ * Send an OTP email to a recipient for login.
+ */
+async function sendRecipientOTPEmail(recipientEmail, recipientName, otp) {
+  const transport = await getTransporter();
+  const fromAddress = process.env.EMAIL_FROM || "noreply@proofsy.io";
+
+  const safeRecipientName = escapeHtml(recipientName);
+  const safeOtp = escapeHtml(otp);
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#f4f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <div style="max-width:560px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
+    <div style="background:linear-gradient(135deg,#4F46E5,#6366F1);padding:32px 24px;text-align:center;">
+      <h1 style="color:#fff;font-size:20px;margin:0;">Proofsy Login Code</h1>
+    </div>
+    <div style="padding:32px 24px;">
+      <p style="color:#111;font-size:15px;margin:0 0 16px;">Hi <strong>${safeRecipientName}</strong>,</p>
+      <p style="color:#374151;font-size:14px;line-height:1.6;margin:0 0 24px;">
+        Use the following one-time password (OTP) to sign in to your Proofsy certificate portal:
+      </p>
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;padding:24px;margin:0 0 24px;text-align:center;">
+        <span style="font-size:32px;font-weight:700;letter-spacing:4px;color:#4F46E5;font-family:monospace;">${safeOtp}</span>
+      </div>
+      <p style="color:#6b7280;font-size:13px;margin:0;">
+        This code expires in 10 minutes. If you didn't request this, you can safely ignore this email.
+      </p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const info = await transport.sendMail({
+    from: `"Proofsy" <${fromAddress}>`,
+    to: recipientEmail,
+    subject: `Your Proofsy Login Code: ${otp}`,
+    text: `Hi ${recipientName},\n\nYour Proofsy login code is: ${otp}\n\nThis code expires in 10 minutes.\n\n— Proofsy`,
+    html,
+  });
+
+  const previewUrl = nodemailer.getTestMessageUrl(info);
+  if (previewUrl) {
+    console.log(`[Email] Preview: ${previewUrl}`);
+  }
+
+  return { messageId: info.messageId, previewUrl: previewUrl || null };
+}
+
+/**
  * Send emails for all generated certificates of a given event.
  */
 async function sendEventEmails(eventId) {
   const Certificate = require("../models/Certificate");
   const User = require("../models/User");
   const Event = require("../models/Event");
+  const Workspace = require("../models/Workspace");
 
   const event = await Event.findById(eventId);
   if (!event) return { sent: 0, failed: 0 };
+
+  const workspace = await Workspace.findById(event.workspaceId);
+  const smtpSettings = workspace ? workspace.smtpSettings : null;
+  const workspaceSlug = workspace ? workspace.slug : "verify";
 
   const certs = await Certificate.find({ eventId, status: "generated" }).populate("userId");
 
@@ -205,7 +283,8 @@ async function sendEventEmails(eventId) {
         eventDate: event.date,
         verificationCode: cert.verificationCode,
         pdfUrl: cert.pdfUrl ? `${publicUrl}${cert.pdfUrl}` : null,
-        verifyUrl: `${frontendUrl}/verify?code=${encodeURIComponent(cert.verificationCode)}`,
+        verifyUrl: `${frontendUrl}/verify/${workspaceSlug}/${cert.verificationCode}`,
+        smtpSettings,
       });
       sent++;
       console.log(`[Email] Sent to ${cert.userId.email}`);
@@ -219,4 +298,4 @@ async function sendEventEmails(eventId) {
   return { sent, failed };
 }
 
-module.exports = { sendCertificateEmail, sendEventEmails, getTransporter };
+module.exports = { sendCertificateEmail, sendEventEmails, sendRecipientOTPEmail, getTransporter };

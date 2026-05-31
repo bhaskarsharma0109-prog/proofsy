@@ -1,11 +1,10 @@
 "use client";
 
 export type OnboardingAction =
-  | "viewedTemplates"
-  | "selectedTemplate"
   | "createdEvent"
+  | "addedRecipients"
   | "issuedCredentials"
-  | "viewedAnalytics";
+  | "verifiedCertificate";
 
 const STORAGE_KEY = "proofsy:onboarding";
 const UPDATE_EVENT = "proofsy:onboarding-updated";
@@ -17,19 +16,17 @@ export const onboardingSteps: Array<{
   label: string;
   href: string;
 }> = [
-  { id: "viewedTemplates", label: "Browse templates", href: "/templates" },
-  { id: "selectedTemplate", label: "Choose a design", href: "/templates" },
-  { id: "createdEvent", label: "Create an event", href: "/events/new" },
-  { id: "issuedCredentials", label: "Issue credentials", href: "/events/new" },
-  { id: "viewedAnalytics", label: "Review analytics", href: "/analytics" },
+  { id: "createdEvent", label: "Create event", href: "/events/new" },
+  { id: "addedRecipients", label: "Add recipients", href: "/events" },
+  { id: "issuedCredentials", label: "Generate certificates", href: "/events" },
+  { id: "verifiedCertificate", label: "Verify certificate", href: "/verify" },
 ];
 
 export const emptyOnboardingState: OnboardingState = {
-  viewedTemplates: false,
-  selectedTemplate: false,
   createdEvent: false,
+  addedRecipients: false,
   issuedCredentials: false,
-  viewedAnalytics: false,
+  verifiedCertificate: false,
 };
 
 export function readOnboardingState(): OnboardingState {

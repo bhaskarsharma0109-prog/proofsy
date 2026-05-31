@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import Sidebar from "@/components/Sidebar";
 import MetricCard from "@/components/MetricCard";
 import { api, CertificateData, EventData, StatsData } from "@/lib/api";
-import { pageVariants, staggerContainer, fadeUp, headerSlide, tableRow, float, pulseGlow, cardHover, cardTap } from "@/lib/animations";
+import { pageVariants, staggerContainer, fadeUp, headerSlide, float, pulseGlow, cardHover, cardTap } from "@/lib/animations";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <motion.div variants={staggerContainer} className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {events.map((e, i) => {
+                {events.map((e) => {
                   const eventCerts = certificates.filter((c) => c.eventName === e.name);
                   const eventGenerated = eventCerts.filter((c) => c.status === "generated").length;
                   const eventRecipients = new Set(eventCerts.map((c) => c.recipientEmail.toLowerCase())).size;

@@ -27,8 +27,14 @@ const TeamMemberSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["owner", "member"],
-      default: "member",
+      enum: ["owner", "admin", "editor", "viewer"],
+      default: "editor",
+    },
+    workspaceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Workspace",
+      default: null,
+      index: true,
     },
   },
   { timestamps: true }

@@ -10,12 +10,12 @@ if (!fs.existsSync(FONTS_DIR)) {
 // Map frontend font names to Google Fonts URL (ttf format)
 const FONT_URLS = {
   "Inter": {
-    normal: "https://github.com/rsms/inter/raw/master/docs/font-files/Inter-Regular.ttf",
-    bold: "https://github.com/rsms/inter/raw/master/docs/font-files/Inter-Bold.ttf"
+    normal: "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf",
+    bold: "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf"
   },
   "Roboto": {
-    normal: "https://github.com/google/fonts/raw/main/ofl/roboto/Roboto-Regular.ttf",
-    bold: "https://github.com/google/fonts/raw/main/ofl/roboto/Roboto-Bold.ttf"
+    normal: "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf",
+    bold: "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf"
   },
   "Poppins": {
     normal: "https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf",
