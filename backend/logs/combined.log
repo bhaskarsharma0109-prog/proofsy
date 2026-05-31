@@ -560,3 +560,16 @@
 {"environment":"test","level":"info","message":"\u001b[0mGET /api/verify/VALID-123 \u001b[32m200\u001b[0m 32.959 ms - 329\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:35.910"}
 {"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[33m400\u001b[0m 33.303 ms - 83\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:36.067"}
 {"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[32m202\u001b[0m 64.955 ms - 132\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:14:36.238"}
+{"environment":"test","level":"info","message":"Using default for STORAGE_PROVIDER: local","service":"proofsy-backend","timestamp":"2026-05-31 23:52:11.458"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_WINDOW_MS: 900000","service":"proofsy-backend","timestamp":"2026-05-31 23:52:11.462"}
+{"environment":"test","level":"info","message":"Using default for RATE_LIMIT_MAX: 1000","service":"proofsy-backend","timestamp":"2026-05-31 23:52:11.468"}
+{"environment":"test","level":"info","message":"✓ Environment validated: test","service":"proofsy-backend","timestamp":"2026-05-31 23:52:11.470"}
+{"environment":"test","level":"info","message":"✓ Storage provider: local","service":"proofsy-backend","timestamp":"2026-05-31 23:52:11.472"}
+{"environment":"test","level":"info","message":"✓ Log level: info","service":"proofsy-backend","timestamp":"2026-05-31 23:52:11.474"}
+{"environment":"test","level":"info","message":"✓ Static /storage route mounted (local filesystem mode)","service":"proofsy-backend","timestamp":"2026-05-31 23:52:11.497"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[32m201\u001b[0m 40.605 ms - 102\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:52:13.643"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/users \u001b[33m409\u001b[0m 10.311 ms - 47\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:52:13.679"}
+{"environment":"test","level":"info","message":"\u001b[0mGET /api/verify/INVALID-CODE-123 \u001b[33m404\u001b[0m 5.406 ms - 79\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:52:13.834"}
+{"environment":"test","level":"info","message":"\u001b[0mGET /api/verify/VALID-123 \u001b[32m200\u001b[0m 29.182 ms - 682\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:52:13.981"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[33m400\u001b[0m 40.434 ms - 83\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:52:14.154"}
+{"environment":"test","level":"info","message":"\u001b[0mPOST /api/certificates/generate \u001b[32m202\u001b[0m 106.052 ms - 132\u001b[0m","service":"proofsy-backend","timestamp":"2026-05-31 23:52:14.369"}
