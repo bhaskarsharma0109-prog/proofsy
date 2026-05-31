@@ -31,9 +31,10 @@ const defaultBranding = {
 };
 
 function normalizeBranding(branding = {}) {
+  const plainBranding = typeof branding.toObject === "function" ? branding.toObject() : branding;
   return {
     ...defaultBranding,
-    ...branding,
+    ...plainBranding,
   };
 }
 

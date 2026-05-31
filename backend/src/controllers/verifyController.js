@@ -13,9 +13,11 @@ const defaultBranding = {
 };
 
 function normalizeBranding(workspace) {
+  const rawBranding = workspace?.branding;
+  const plainBranding = rawBranding && typeof rawBranding.toObject === "function" ? rawBranding.toObject() : rawBranding;
   const branding = {
     ...defaultBranding,
-    ...(workspace?.branding || {}),
+    ...(plainBranding || {}),
   };
 
   return {

@@ -157,6 +157,11 @@ export interface RecipientPortalData {
     eventDate: string | null;
     verificationCode: string;
     pdfUrl: string | null;
+    status?: CertificateStatus;
+    expiresAt?: string | null;
+    revokedAt?: string | null;
+    revocationReason?: string;
+    suspendedAt?: string | null;
     issuedAt: string;
     linkedInAddUrl?: string;
   }>;
