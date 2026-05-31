@@ -259,6 +259,10 @@ exports.listCertificates = async (req, res) => {
         pngUrl: c.pngUrl || null,
         svgUrl: c.svgUrl || null,
         status: c.status,
+        expiresAt: c.expiresAt ? c.expiresAt.toISOString() : null,
+        revokedAt: c.revokedAt ? c.revokedAt.toISOString() : null,
+        revocationReason: c.revocationReason || "",
+        suspendedAt: c.suspendedAt ? c.suspendedAt.toISOString() : null,
         issuedAt: c.createdAt.toISOString(),
       })),
     });
@@ -345,6 +349,11 @@ exports.getCertificateById = async (req, res) => {
         pngUrl: certificate.pngUrl || null,
         svgUrl: certificate.svgUrl || null,
         status: certificate.status,
+        expiresAt: certificate.expiresAt ? certificate.expiresAt.toISOString() : null,
+        revokedAt: certificate.revokedAt ? certificate.revokedAt.toISOString() : null,
+        revocationReason: certificate.revocationReason || "",
+        suspendedAt: certificate.suspendedAt ? certificate.suspendedAt.toISOString() : null,
+        renewedFrom: certificate.renewedFrom || null,
         attemptsCount: certificate.attemptsCount,
         errorLog: certificate.errorLog,
         cryptographicSignature: certificate.cryptographicSignature || null,
@@ -403,6 +412,9 @@ exports.getStats = async (req, res) => {
       generated,
       pending,
       failed,
+      revoked,
+      expired,
+      suspended,
       totalEvents,
       uniqueRecipients,
       recentEvents
@@ -411,6 +423,9 @@ exports.getStats = async (req, res) => {
       Certificate.countDocuments({ ...certFilter, status: "generated" }),
       Certificate.countDocuments({ ...certFilter, status: "pending" }),
       Certificate.countDocuments({ ...certFilter, status: "failed" }),
+      Certificate.countDocuments({ ...certFilter, status: "revoked" }),
+      Certificate.countDocuments({ ...certFilter, status: "expired" }),
+      Certificate.countDocuments({ ...certFilter, status: "suspended" }),
       Event.countDocuments(eventFilter),
       Certificate.distinct("userId", certFilter),
       Event.find(eventFilter).sort({ createdAt: -1 }).limit(5).lean()
@@ -475,6 +490,9 @@ exports.getStats = async (req, res) => {
         generated,
         pending,
         failed,
+        revoked,
+        expired,
+        suspended,
         totalEvents,
         totalUsers,
         verificationRate,
@@ -671,4 +689,3 @@ exports.getVerificationAnalytics = async (req, res) => {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
-

@@ -27,8 +27,10 @@ const certQueue = new Queue("certificate-generation", REDIS_URL, {
 
 const { ensureStarterTemplates } = require("./utils/templateSetup");
 const storageService = require("./services/storageService");
+const { startExpiryChecker } = require("./jobs/expiryChecker");
 
 let isShuttingDown = false;
+let expiryQueue = null;
 
 async function boot() {
   // Ensure starter templates exist in runtime volume
@@ -45,6 +47,7 @@ async function boot() {
 
   // Require the generation logic *after* Mongoose is connected so models work
   const { queueCertificateGeneration } = require("./workers/certificateWorker");
+  expiryQueue = startExpiryChecker(REDIS_URL);
 
   // Process jobs — concurrency of 2 keeps memory sane on a single VM
   certQueue.process(2, async (job) => {
@@ -108,6 +111,11 @@ async function gracefulShutdown(signal) {
     // Close the queue connection
     await certQueue.close();
     console.log("[Worker] ✓ Queue closed");
+
+    if (expiryQueue) {
+      await expiryQueue.close();
+      console.log("[Worker] Expiry queue closed");
+    }
 
     // Disconnect from MongoDB
     await mongoose.disconnect();

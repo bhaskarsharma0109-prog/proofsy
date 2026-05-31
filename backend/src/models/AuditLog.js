@@ -11,17 +11,19 @@ const AuditLogSchema = new mongoose.Schema(
     actorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TeamMember",
-      required: true,
+      required: false,
     },
     actorName: {
       type: String,
       required: true,
       trim: true,
+      default: "System",
     },
     actorEmail: {
       type: String,
       required: true,
       trim: true,
+      default: "system@proofsy",
     },
     action: {
       type: String,
@@ -29,6 +31,11 @@ const AuditLogSchema = new mongoose.Schema(
       enum: [
         "certificate_issued",
         "certificate_revoked",
+        "certificate_suspended",
+        "certificate_reinstated",
+        "certificate_renewed",
+        "certificate_expired",
+        "certificate_expiry_updated",
         "template_created",
         "template_updated",
         "template_deleted",

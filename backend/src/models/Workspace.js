@@ -48,6 +48,15 @@ const WorkspaceSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    branding: {
+      logo: { type: String, default: "" },
+      primaryColor: { type: String, default: "#2563EB" },
+      accentColor: { type: String, default: "#16A34A" },
+      customDomain: { type: String, default: "" },
+      brandingEnabled: { type: Boolean, default: false },
+      verificationPageTitle: { type: String, default: "" },
+      footerText: { type: String, default: "" },
+    },
   },
   { timestamps: true }
 );

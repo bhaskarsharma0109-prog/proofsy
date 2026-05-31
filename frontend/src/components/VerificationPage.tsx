@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { PDFDocument } from "pdf-lib";
-import { api, BACKEND_URL } from "@/lib/api";
+import { api, BACKEND_URL, BrandingData, CertificateStatus } from "@/lib/api";
 import { fadeUp, float, pulseGlow } from "@/lib/animations";
 import { trackOnboarding } from "@/lib/onboarding";
+import BrandedVerificationCard from "@/components/BrandedVerificationCard";
 
 // Helper: Convert PEM string to ArrayBuffer for browser Web Crypto
 function pemToArrayBuffer(pem: string): ArrayBuffer {
@@ -47,13 +48,21 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
     recipientName: string;
     eventName: string;
     eventDate: string | null;
+    organizerName?: string;
     issuedAt: string;
+    expiresAt?: string | null;
+    revokedAt?: string | null;
+    revocationReason?: string;
+    suspendedAt?: string | null;
+    status?: CertificateStatus;
     pdfUrl: string | null;
     pngUrl?: string | null;
     svgUrl?: string | null;
     cryptographicSignature: string | null;
     isCryptographicallyVerified: boolean;
   } | null>(null);
+  const [branding, setBranding] = useState<BrandingData | null>(null);
+  const [invalidReason, setInvalidReason] = useState<string | null>(null);
 
   // File verification states
   const [file, setFile] = useState<File | null>(null);
@@ -84,14 +93,20 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
       setActiveTab("code");
       setStatus("loading");
       setCertData(null);
+      setBranding(null);
+      setInvalidReason(null);
 
       const res = await api.verifyCertificate(initialCode.trim());
 
       if (res.success && res.data?.isValid) {
         setCertData(res.data.certificate);
+        setBranding(res.data.branding || null);
         setStatus("valid");
         trackOnboarding("verifiedCertificate");
       } else {
+        setCertData(res.data?.certificate || null);
+        setBranding(res.data?.branding || null);
+        setInvalidReason(res.data?.reason || res.error || "No database record corresponds to this code.");
         setStatus("invalid");
       }
     }
@@ -105,14 +120,20 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
     if (!code.trim()) return;
     setStatus("loading");
     setCertData(null);
+    setBranding(null);
+    setInvalidReason(null);
 
     const res = await api.verifyCertificate(code.trim());
 
     if (res.success && res.data?.isValid) {
       setCertData(res.data.certificate);
+      setBranding(res.data.branding || null);
       setStatus("valid");
       trackOnboarding("verifiedCertificate");
     } else {
+      setCertData(res.data?.certificate || null);
+      setBranding(res.data?.branding || null);
+      setInvalidReason(res.data?.reason || res.error || "No database record corresponds to this code.");
       setStatus("invalid");
     }
   };
@@ -126,6 +147,8 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
       setFileError("Unsupported file type. Please upload a Proofsy certificate PDF.");
       setFile(null);
       setCertData(null);
+      setBranding(null);
+      setInvalidReason(null);
       return;
     }
 
@@ -133,6 +156,8 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
     setFileStatus("loading");
     setFileError(null);
     setCertData(null);
+    setBranding(null);
+    setInvalidReason(null);
 
     try {
       // 1. Get dynamic public key if not yet cached
@@ -265,15 +290,27 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
     setFileStatus("idle");
     setFileError(null);
     setCertData(null);
+    setBranding(null);
+    setInvalidReason(null);
   };
 
   const formatDate = (iso: string | null) => {
     if (!iso) return "N/A";
     return new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   };
+  const activeBranding = branding?.brandingEnabled ? branding : null;
+  const brandedVars = activeBranding
+    ? ({
+        "--color-primary": activeBranding.primaryColor,
+        "--color-primary-dark": activeBranding.primaryColor,
+        "--color-success": activeBranding.accentColor,
+      } as CSSProperties)
+    : undefined;
+  const portalTitle = activeBranding?.verificationPageTitle || "Credential Verification";
+  const footerText = activeBranding?.footerText || "Powered by Proofsy. Certificate authenticity guaranteed.";
 
   return (
-    <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--color-background)] flex flex-col relative overflow-hidden" style={brandedVars}>
       {/* Decorative background */}
       <motion.div variants={pulseGlow} animate="animate" className="absolute top-1/4 -left-20 w-80 h-80 bg-blue-200/15 rounded-full blur-3xl pointer-events-none" />
       <motion.div variants={pulseGlow} animate="animate" style={{ animationDelay: '1.5s' }} className="absolute bottom-1/4 -right-20 w-72 h-72 bg-purple-200/10 rounded-full blur-3xl pointer-events-none" />
@@ -288,9 +325,13 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-              <Image src="/logo.svg" alt="Proofsy" width={32} height={32} className="object-contain" />
+              {activeBranding?.logo ? (
+                <img src={activeBranding.logo} alt={activeBranding.workspaceName || "Issuer"} className="w-8 h-8 object-contain" />
+              ) : (
+                <Image src="/logo.svg" alt="Proofsy" width={32} height={32} className="object-contain" />
+              )}
             </div>
-            <span className="text-base font-bold text-[var(--color-foreground)]">Proofsy</span>
+            <span className="text-base font-bold text-[var(--color-foreground)]">{activeBranding?.workspaceName || "Proofsy"}</span>
           </Link>
           <span className="text-xs font-mono text-[var(--color-muted)] uppercase tracking-widest">Verification Portal</span>
         </div>
@@ -311,7 +352,7 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
               </svg>
             </motion.div>
-            <h1 className="text-2xl font-bold text-[var(--color-foreground)]">Credential Verification</h1>
+            <h1 className="text-2xl font-bold text-[var(--color-foreground)]">{portalTitle}</h1>
             <p className="text-xs text-[var(--color-muted)] max-w-xs mx-auto">
               Choose your verification method to instantly validate any Proofsy certificate.
             </p>
@@ -320,7 +361,7 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
           {/* Premium Tab Selector */}
           <motion.div variants={fadeUp} className="flex p-1 bg-[var(--color-surface-alt)] border border-[var(--color-border)] rounded-xl">
             <button
-              onClick={() => { setActiveTab("code"); setCertData(null); }}
+              onClick={() => { setActiveTab("code"); setCertData(null); setInvalidReason(null); }}
               className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                 activeTab === "code"
                   ? "bg-white text-[var(--color-primary)] shadow-sm"
@@ -414,6 +455,11 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
                         </div>
                       </div>
                       <div className="p-5 space-y-4">
+                        <BrandedVerificationCard
+                          certificate={certData}
+                          branding={branding}
+                          isValid
+                        />
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <p className="text-[9px] font-semibold uppercase tracking-wider text-[var(--color-muted)] mb-0.5">Recipient</p>
@@ -574,11 +620,21 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
                         </div>
                         <div>
                           <h2 className="text-sm font-bold text-[var(--color-error)]">Verification Failed</h2>
-                          <p className="text-[10px] text-[var(--color-error)] opacity-75">No database record corresponds to this code.</p>
+                          <p className="text-[10px] text-[var(--color-error)] opacity-75">{invalidReason || "No database record corresponds to this code."}</p>
                         </div>
                       </div>
-                      <div className="p-4 text-xs text-[var(--color-muted)]">
-                        Verify that the code matches the string printed on your certificate exactly, then try again.
+                      <div className="p-4 text-xs text-[var(--color-muted)] space-y-4">
+                        {certData ? (
+                          <BrandedVerificationCard
+                            certificate={certData}
+                            branding={branding}
+                            isValid={false}
+                            reason={invalidReason}
+                          />
+                        ) : null}
+                        <p>
+                          Verify that the code matches the string printed on your certificate exactly, then try again.
+                        </p>
                       </div>
                     </motion.div>
                   )}
@@ -773,7 +829,7 @@ export default function VerificationPage({ initialCode = "" }: { initialCode?: s
 
       {/* Footer */}
       <footer className="border-t border-[var(--color-border)] py-4 text-center">
-        <p className="text-[11px] text-[var(--color-muted)]">Powered by Proofsy. Certificate authenticity guaranteed.</p>
+        <p className="text-[11px] text-[var(--color-muted)]">{footerText}</p>
       </footer>
     </div>
   );

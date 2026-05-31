@@ -83,14 +83,32 @@ export interface EventData {
   duration?: string;
 }
 
+export type CertificateStatus = "pending" | "generated" | "failed" | "revoked" | "expired" | "suspended";
+
+export interface BrandingData {
+  workspaceId?: string | null;
+  workspaceName?: string;
+  logo: string;
+  primaryColor: string;
+  accentColor: string;
+  customDomain: string;
+  brandingEnabled: boolean;
+  verificationPageTitle: string;
+  footerText: string;
+}
+
 export interface EventDetailData extends EventData {
   certificates: Array<{
     id: string;
     recipientName: string;
     recipientEmail: string;
     verificationCode: string;
-    status: "pending" | "generated" | "failed";
+    status: CertificateStatus;
     pdfUrl: string | null;
+    expiresAt?: string | null;
+    revokedAt?: string | null;
+    revocationReason?: string;
+    suspendedAt?: string | null;
     issuedAt: string;
   }>;
 }
@@ -106,7 +124,12 @@ export interface CertificateData {
   pdfUrl: string | null;
   pngUrl?: string | null;
   svgUrl?: string | null;
-  status: "pending" | "generated" | "failed";
+  status: CertificateStatus;
+  expiresAt?: string | null;
+  revokedAt?: string | null;
+  revocationReason?: string;
+  suspendedAt?: string | null;
+  renewedFrom?: string | null;
   issuedAt: string;
 }
 
@@ -144,6 +167,9 @@ export interface StatsData {
   generated: number;
   pending: number;
   failed: number;
+  revoked?: number;
+  expired?: number;
+  suspended?: number;
   totalEvents: number;
   totalUsers: number;
   verificationRate: number;
@@ -275,6 +301,43 @@ export const api = {
       method: "POST",
     }),
 
+  revokeCertificate: (id: string, reason: string) =>
+    request<CertificateData>(`/certificates/${encodeURIComponent(id)}/revoke`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+
+  bulkRevokeCertificates: (ids: string[], reason: string) =>
+    request<{ updated: number; ids: string[] }>("/certificates/bulk-revoke", {
+      method: "POST",
+      body: JSON.stringify({ ids, reason }),
+    }),
+
+  suspendCertificate: (id: string) =>
+    request<CertificateData>(`/certificates/${encodeURIComponent(id)}/suspend`, {
+      method: "POST",
+    }),
+
+  reinstateCertificate: (id: string) =>
+    request<CertificateData>(`/certificates/${encodeURIComponent(id)}/reinstate`, {
+      method: "POST",
+    }),
+
+  renewCertificate: (id: string, expiresAt?: string | null) =>
+    request<CertificateData>(`/certificates/${encodeURIComponent(id)}/renew`, {
+      method: "POST",
+      body: JSON.stringify({ expiresAt }),
+    }),
+
+  updateCertificateExpiry: (id: string, expiresAt: string | null) =>
+    request<CertificateData>(`/certificates/${encodeURIComponent(id)}/expiry`, {
+      method: "PUT",
+      body: JSON.stringify({ expiresAt }),
+    }),
+
+  getExpiringCertificates: (days = 30) =>
+    request<CertificateData[]>(`/certificates/expiring?days=${encodeURIComponent(String(days))}`),
+
   // Integrations
   getIntegrations: () => request<Record<string, unknown>>("/integrations"),
   updateZapierIntegration: (connected: boolean, webhookUrl?: string) =>
@@ -326,11 +389,20 @@ export const api = {
   verifyCertificate: (code: string) =>
     request<{
       isValid: boolean;
+      reason?: string;
+      branding?: BrandingData;
       certificate: {
         recipientName: string;
+        recipientEmail?: string;
         eventName: string;
         eventDate: string | null;
+        organizerName?: string;
         issuedAt: string;
+        expiresAt?: string | null;
+        revokedAt?: string | null;
+        revocationReason?: string;
+        suspendedAt?: string | null;
+        status?: CertificateStatus;
         pdfUrl: string | null;
         pngUrl?: string | null;
         svgUrl?: string | null;
@@ -408,6 +480,21 @@ export const api = {
   inviteWorkspaceMember: (workspaceId: string, data: any) => request<any>(`/workspaces/${workspaceId}/invite`, { method: "POST", body: JSON.stringify(data) }),
   updateWorkspaceSmtp: (workspaceId: string, data: any) => request<any>(`/workspaces/${workspaceId}/smtp`, { method: "PUT", body: JSON.stringify(data) }),
   listWorkspaceMembers: (workspaceId: string) => request<any>(`/workspaces/${workspaceId}/members`),
+  getBranding: (workspaceId: string) =>
+    request<{ workspaceId: string; workspaceName: string; branding: BrandingData }>(`/branding/${encodeURIComponent(workspaceId)}`),
+  updateBranding: (body: Partial<BrandingData>) =>
+    request<{ workspaceId: string; workspaceName: string; branding: BrandingData }>("/branding", {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+  uploadBrandingLogo: (file: File) => {
+    const formData = new FormData();
+    formData.append("logo", file);
+    return request<{ logo: string; branding: BrandingData }>("/branding/logo", {
+      method: "POST",
+      body: formData,
+    });
+  },
   initiatePayment: (plan: string) => request<any>("/billing/pay", { method: "POST", body: JSON.stringify({ plan }) }),
   getTransactionStatus: (txnId: string, mock?: boolean) => request<any>(`/billing/status/${txnId}?mock=${mock ? "true" : "false"}`),
 

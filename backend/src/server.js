@@ -125,6 +125,7 @@ app.use("/api/billing", require("./routes/billing"));
 app.use("/api/integrations", require("./routes/integrations"));
 app.use("/api/custom-fonts", require("./routes/customFonts"));
 app.use("/api/audit-logs", require("./routes/auditLogs"));
+app.use("/api/branding", require("./routes/branding"));
 app.use("/api/v1", require("./routes/v1"));
 
 // Health check endpoint — detailed system status

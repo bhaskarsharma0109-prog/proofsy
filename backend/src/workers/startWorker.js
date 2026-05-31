@@ -6,6 +6,7 @@ require("dotenv").config({ path: require("path").join(__dirname, "../../.env") }
 const mongoose = require("mongoose");
 const Queue = require("bull");
 const { queueCertificateGeneration } = require("./certificateWorker");
+const { startExpiryChecker } = require("../jobs/expiryChecker");
 
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/proofsy";
@@ -18,6 +19,7 @@ async function start() {
   // Create queue consumer
   const certQueue = new Queue("certificate-generation", REDIS_URL);
   console.log("[Worker] ✓ Connected to Redis, waiting for jobs...");
+  startExpiryChecker(REDIS_URL);
 
   certQueue.process(async (job) => {
     const { eventId } = job.data;

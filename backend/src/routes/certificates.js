@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const certificateController = require("../controllers/certificateController");
+const lifecycleController = require("../controllers/lifecycleController");
 const { protect } = require("../middleware/auth");
 const { tenantProtect } = require("../middleware/tenantProtect");
 
@@ -35,8 +36,15 @@ router.post("/generate", protect, tenantProtect, upload.single("file"), certific
 router.post("/send-emails", protect, tenantProtect, certificateController.sendEmails);
 router.get("/stats", protect, tenantProtect, certificateController.getStats);
 router.get("/verification-analytics", protect, tenantProtect, certificateController.getVerificationAnalytics);
+router.get("/expiring", protect, tenantProtect, lifecycleController.listExpiringCertificates);
 router.get("/", protect, tenantProtect, certificateController.listCertificates);
+router.post("/bulk-revoke", protect, tenantProtect, lifecycleController.bulkRevokeCertificates);
 router.get("/:id", protect, tenantProtect, certificateController.getCertificateById);
 router.post("/:id/retry", protect, tenantProtect, certificateController.retryCertificate);
+router.put("/:id/expiry", protect, tenantProtect, lifecycleController.setCertificateExpiry);
+router.post("/:id/revoke", protect, tenantProtect, lifecycleController.revokeCertificate);
+router.post("/:id/suspend", protect, tenantProtect, lifecycleController.suspendCertificate);
+router.post("/:id/reinstate", protect, tenantProtect, lifecycleController.reinstateCertificate);
+router.post("/:id/renew", protect, tenantProtect, lifecycleController.renewCertificate);
 
 module.exports = router;

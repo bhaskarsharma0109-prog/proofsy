@@ -1,5 +1,62 @@
 const Certificate = require("../models/Certificate");
+const Workspace = require("../models/Workspace");
 const { verifyCertificateSignature, getPublicKeyPem } = require("../services/signatureService");
+
+const defaultBranding = {
+  logo: "",
+  primaryColor: "#2563EB",
+  accentColor: "#16A34A",
+  customDomain: "",
+  brandingEnabled: false,
+  verificationPageTitle: "",
+  footerText: "",
+};
+
+function normalizeBranding(workspace) {
+  const branding = {
+    ...defaultBranding,
+    ...(workspace?.branding || {}),
+  };
+
+  return {
+    workspaceId: workspace?._id || null,
+    workspaceName: workspace?.name || "Proofsy",
+    ...branding,
+  };
+}
+
+function serializeCertificate(certificate, isSignatureValid = false) {
+  return {
+    recipientName: certificate.userId?.name || "Unknown",
+    recipientEmail: certificate.userId?.email || "",
+    eventName: certificate.eventId?.name || "Unknown Event",
+    eventDate: certificate.eventId?.date?.toISOString() || null,
+    organizerName: certificate.eventId?.organizerName || "",
+    issuedAt: certificate.createdAt.toISOString(),
+    expiresAt: certificate.expiresAt ? certificate.expiresAt.toISOString() : null,
+    revokedAt: certificate.revokedAt ? certificate.revokedAt.toISOString() : null,
+    revocationReason: certificate.revocationReason || "",
+    suspendedAt: certificate.suspendedAt ? certificate.suspendedAt.toISOString() : null,
+    status: certificate.status,
+    pdfUrl: certificate.pdfUrl,
+    pngUrl: certificate.pngUrl || null,
+    svgUrl: certificate.svgUrl || null,
+    cryptographicSignature: certificate.cryptographicSignature || null,
+    isCryptographicallyVerified: isSignatureValid,
+  };
+}
+
+function invalidVerificationResponse(res, reason, certificate, branding) {
+  return res.json({
+    success: true,
+    data: {
+      isValid: false,
+      reason,
+      branding,
+      certificate: serializeCertificate(certificate),
+    },
+  });
+}
 
 // GET /api/verify/:code
 exports.verifyCertificate = async (req, res) => {
@@ -17,6 +74,29 @@ exports.verifyCertificate = async (req, res) => {
         success: false,
         error: "Invalid verification code or certificate not found.",
       });
+    }
+
+    const workspace = await Workspace.findById(certificate.workspaceId).select("name branding").lean();
+    const branding = normalizeBranding(workspace);
+
+    const now = new Date();
+    if (certificate.status === "revoked") {
+      return invalidVerificationResponse(
+        res,
+        certificate.revocationReason || "Certificate has been revoked",
+        certificate,
+        branding
+      );
+    }
+    if (certificate.status === "suspended") {
+      return invalidVerificationResponse(res, "Certificate is currently suspended", certificate, branding);
+    }
+    if (certificate.status === "expired" || (certificate.expiresAt && certificate.expiresAt < now)) {
+      if (certificate.status === "generated") {
+        certificate.status = "expired";
+        await certificate.save();
+      }
+      return invalidVerificationResponse(res, "Certificate has expired", certificate, branding);
     }
 
     // On-demand PNG & SVG retrofit for legacy certificates
@@ -142,18 +222,8 @@ exports.verifyCertificate = async (req, res) => {
       success: true,
       data: {
         isValid: true,
-        certificate: {
-          recipientName: certificate.userId?.name || "Unknown",
-          recipientEmail: certificate.userId?.email || "",
-          eventName: certificate.eventId?.name || "Unknown Event",
-          eventDate: certificate.eventId?.date?.toISOString() || null,
-          issuedAt: certificate.createdAt.toISOString(),
-          pdfUrl: certificate.pdfUrl,
-          pngUrl: certificate.pngUrl || null,
-          svgUrl: certificate.svgUrl || null,
-          cryptographicSignature: certificate.cryptographicSignature || null,
-          isCryptographicallyVerified: isSignatureValid,
-        },
+        branding,
+        certificate: serializeCertificate(certificate, isSignatureValid),
       },
     });
   } catch (err) {
